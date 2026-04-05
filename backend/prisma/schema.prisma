@@ -1,0 +1,190 @@
+
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+  
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  password        String
+  name            String?
+  
+  gymId           String?
+  gym             Gym?      @relation(fields: [gymId], references: [id])
+
+
+  emailVerified   Boolean @default(false)
+  emailVerifiedAt DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+//  admin           Admin?
+ admins Admin[]
+
+  equipments      Equipment[]
+  maintenances    Maintenance[]
+
+  resetTokens       PasswordResetToken[]
+  verifyTokens      EmailVerificationToken[]
+
+  @@index([email])
+
+  @@index([gymId])
+}
+
+
+enum AdminRole {
+  ADMIN
+  OWNER
+  STAFF
+}
+
+model Admin {
+  id        String    @id @default(uuid())
+
+  userId    String    
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role      AdminRole @default(STAFF)
+  gymId     String?   // null za platform ADMIN
+  gym       Gym?      @relation(fields: [gymId], references: [id])
+
+  createdAt DateTime  @default(now())
+
+  isOwner   Boolean   @default(false)
+
+  @@unique([userId, gymId], name: "admin_user_gym_unique")
+  @@index([gymId])
+}
+// Password reset token (forgot password)
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+  @@index([userId, expiresAt])
+}
+// Tokens for OTP, email verification
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([token])
+  @@index([userId])
+}
+
+model Equipment {
+  id         String     @id @default(uuid())
+  name       String
+
+  brand      String?
+  model      String?
+
+  categoryId String
+  category   Category  @relation(fields: [categoryId], references: [id])
+
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  gymId       String
+  gym         Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+
+  maintenances Maintenance[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([categoryId])
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+
+  createdAt DateTime  @default(now())
+
+  gymId     String?
+  gym       Gym? @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+  equipments Equipment[]
+
+  @@index([name, gymId])
+ 
+}
+
+model Maintenance {
+  id          String    @id @default(uuid())
+
+  title       String
+  description String?
+
+  cost        Float?
+
+  status      MaintenanceStatus @default(COMPLETED)
+
+  performedAt DateTime
+  nextDueDate DateTime?
+
+  equipmentId String
+  equipment  Equipment       @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  gymId       String
+  gym         Gym            @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+
+  createdAt   DateTime @default(now())
+
+   @@index([equipmentId])
+   @@index([userId])
+}
+
+enum MaintenanceStatus {
+  COMPLETED 
+  SCHEDULED
+}
+
+model Gym {
+  id           String      @id  @default(uuid())
+  gymName         String
+  city         String?
+
+  users        User[]
+  equipments   Equipment[]
+  maintenances Maintenance[]
+  categories   Category[]
+  admins        Admin[]
+
+  createdAt    DateTime    @default(now())
+}
+
+
+
+
+
