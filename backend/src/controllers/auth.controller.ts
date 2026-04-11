@@ -301,3 +301,29 @@ export const forgotPassword = async (req:Request, res:Response) => {
         return res.json({ message: "Server error"})
     }
 }
+
+export const getMe = async (req: Request, res: Response) => {
+      
+    const userId = req.user?.userId;
+
+    try {
+        
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                gym: true,
+                admins: true
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found"})
+        }
+
+        const { password, ...safeUser } = user;
+
+        res.json({ user: safeUser });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+}
