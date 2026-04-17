@@ -172,14 +172,14 @@ enum MaintenanceStatus {
 
 model Gym {
   id           String      @id  @default(uuid())
-  gymName         String
+  gymName      String
   city         String?
 
   users        User[]
   equipments   Equipment[]
   maintenances Maintenance[]
   categories   Category[]
-  admins        Admin[]
+  admins       Admin[]
 
   createdAt    DateTime    @default(now())
 }
