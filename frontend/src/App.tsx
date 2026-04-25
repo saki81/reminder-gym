@@ -1,13 +1,12 @@
-
+import { useMe } from "./hooks/auth/useMe"
+//import { AppRouter } from  "./routes/AppRouter";
 
 function App() {
- 
-
-  return (
-    <div>
-       
-    </div>
-  )
+   useMe()
+//  return {/*<AppRouter />*/}
+return (
+  <div></div>
+)
 }
 
 export default App
