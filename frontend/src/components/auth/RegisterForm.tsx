@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Eye,EyeOff } from "lucide-react";
 
@@ -33,10 +33,10 @@ export const RegisterForm = ({ onSubmit, isPending, error }: Props) => {
         formState: { errors },
     } = useForm<RegisterFormData>();
 
-
-    const fieldError = getFieldErrors(error);
-    const hasFieldErrors = Object.keys(fieldError).length > 0;
-    const globalError = error && hasFieldErrors
+    
+    const fieldErrors = getFieldErrors(error);
+    const hasFieldErrors = Object.keys(fieldErrors).length > 0;
+    const globalError = error && !hasFieldErrors
          ? getErrorMessage(error, "Registration failed. Please try again.")
          : null
 

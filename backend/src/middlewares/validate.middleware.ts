@@ -10,7 +10,7 @@ export const validate = (schema: ZodSchema) => {
         if (!result.success) {
 
             return res.status(400).json({
-                error: result.error.flatten().fieldErrors
+                errors: result.error.flatten().fieldErrors
             })
         }
 

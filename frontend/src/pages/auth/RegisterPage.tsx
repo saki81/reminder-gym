@@ -13,8 +13,9 @@ export const RegisterPage = () => {
     const { mutate: register, isPending, error} = useRegister();
 
     const handleSubmit = (data: Register, setError: UseFormSetError<RegisterFormData>) => {
-        
-
+       register(data, {
+        onError: (err) => applyFieldErrors(err, setError)
+       })
     }
 
 
