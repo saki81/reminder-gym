@@ -144,6 +144,10 @@ export function AppRouter() {
 
           </Route>
         </Route>
+
+         <Route path="/unauthorized" element={<UnauthorizedPage />} />
+         <Route path="*" element={<NotFoundPage />} />
+
       
     </Routes>
    )
