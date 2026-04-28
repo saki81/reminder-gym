@@ -6,16 +6,16 @@ import { RoleRoute } from "./RoleRoute";
 import { GymRoute } from "./GymRoute";
 
 // Layouts
-import { Layout } from "../layout/Layout";
-import { AuthLayout } from "../layout/AuthLayout";
-import { AdminLayout } from "../layout/AdminLayout";
+import  Layout  from "../layout/Layout";
+import  AuthLayout  from "../layout/AuthLayout";
+import  AdminLayout  from "../layout/AdminLayout";
 
 // Auth pages
 import { LoginPage } from "../pages/auth/LoginPage";
 import { RegisterPage } from "../pages/auth/RegisterPage";
 import { ForgotPasswordPage } from "../pages/auth/ForgotPasswordPage";
 import { VerifyOtpPage } from "../pages/auth/OtpVeriffyPage";
-import { ResetPasswordPage } from "../pages/auth/ResetPaswordPage";
+import { ResetPasswordPage } from "../pages/auth/ResetPasswordPage";
 
 // Gym pages
 import { CreateGymPage } from "../pages/gym/CreateGymPage";
@@ -53,7 +53,7 @@ export function AppRouter() {
       <Route
         path="/register"
         element={
-           <AuthLayout title="Create account" subtitle="Start managing your gym today">
+           <AuthLayout /*title="Create account" subtitle="Start managing your gym today"*/>
              <RegisterPage />
            </AuthLayout>
           }
