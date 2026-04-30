@@ -40,8 +40,6 @@ import { NotFoundPage } from "../pages/NotFoundPage";
 import { UnauthorizedPage } from "../pages/UnauthorizedPage";
 
 
-
-
 export function AppRouter() {
    return( 
     <Routes>
@@ -53,7 +51,7 @@ export function AppRouter() {
       <Route
         path="/register"
         element={
-           <AuthLayout /*title="Create account" subtitle="Start managing your gym today"*/>
+           <AuthLayout title= "Create account" subtitle="Start managing your gym today"> 
              <RegisterPage />
            </AuthLayout>
           }
@@ -61,7 +59,7 @@ export function AppRouter() {
        <Route 
          path="/login"
          element={
-             <AuthLayout>
+             <AuthLayout title="Welcome back" subtitle="Sign in to Reminder Gym">
                 <LoginPage />
              </AuthLayout>
           }
@@ -69,7 +67,7 @@ export function AppRouter() {
         <Route 
           path="/forgot-password"
           element={
-            <AuthLayout>
+            <AuthLayout title="Forgot password?" subtitle="We'll send a reset code to your email">
                 <ForgotPasswordPage />
             </AuthLayout>
           }
@@ -77,7 +75,7 @@ export function AppRouter() {
         <Route
           path="/verify-otp"
           element={
-            <AuthLayout>
+            <AuthLayout title="Verify your email" subtitle="Enter the 6-digit code we sent you">
                 <VerifyOtpPage />
             </AuthLayout>
           } 
@@ -85,7 +83,7 @@ export function AppRouter() {
         <Route 
           path="/reset-password"
           element={
-             <AuthLayout>
+             <AuthLayout title="Set new password" subtitle="Must be at least 8 characters">
                 <ResetPasswordPage />
              </AuthLayout>
           }

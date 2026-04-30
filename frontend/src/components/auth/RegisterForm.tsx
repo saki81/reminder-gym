@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Eye,EyeOff } from "lucide-react";
 
@@ -38,21 +38,24 @@ export const RegisterForm = ({ onSubmit, isPending, error }: Props) => {
     const hasFieldErrors = Object.keys(fieldErrors).length > 0;
     const globalError = error && !hasFieldErrors
          ? getErrorMessage(error, "Registration failed. Please try again.")
-         : null
+         : null 
 
     const handleFormSubmit = ({ confirmPassword: _, ...data}: RegisterFormData) => {
          onSubmit(data, setError)
     }
 
     return (
-       <form onSubmit={handleSubmit(handleFormSubmit)} noValidate className="space-y-4">
+       <form 
+          onSubmit={handleSubmit(handleFormSubmit)} 
+          noValidate 
+          className="space-y-4">
            
            {globalError && (
               <div className="rounded-lg bg-destructive/10 border border-destructive/20
                               px-4 py-3 text-sm text-destructive text-center">
                  {globalError}
               </div>
-           )}
+           )} 
 
            <div className="space-y-1.5">
              <Label htmlFor="name">Full name</Label>
@@ -117,7 +120,7 @@ export const RegisterForm = ({ onSubmit, isPending, error }: Props) => {
               <Input
                 id="confirmPassword"
                 type={showConfirm ? "text" : "password"}
-                autoComplete="new-passwor"
+                autoComplete="new-password"
                 placeholder="*********"
                 className="pr-10"
                 aria-invalid={!!errors.confirmPassword}
@@ -142,15 +145,18 @@ export const RegisterForm = ({ onSubmit, isPending, error }: Props) => {
              )}     
           </div>
 
-          <Button type="submit" className="w-full mt-2" disabled={isPending}>
+          <Button type="submit" size="lg" className="w-full mt-2 cursor-pointer " disabled={isPending}>
             {isPending ? (
               <span className="flex items-center gap-2">
-               <span className="size-4 rounded-full border-2 border-white/30
-                             border-t-white animate-spin" />
+               <span className="size-6 rounded-full border-2 border-white/30
+                             border-t-white animate-spin text-lg tracking-wide" />
                Creating account…
             </span>
             ) : (
-              "Create account"
+             <span className="text-lg tracking-wide">
+                Create account
+             </span>
+              
             )}
           </Button>
        </form>
