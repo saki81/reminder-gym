@@ -6,8 +6,6 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Button } from "../../components/ui/button";
 
-import { getErrorMessage, getFieldErrors } from "@/hooks/shared/useFieldErrors";
-
 import type { Register } from "../../types/index";
 import type { UseFormSetError } from "react-hook-form";
 
@@ -21,7 +19,7 @@ type Props = {
     error: unknown;
 };
 
-export const RegisterForm = ({ onSubmit, isPending, error }: Props) => {
+export const RegisterForm = ({ onSubmit, isPending }: Props) => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
 
@@ -33,12 +31,6 @@ export const RegisterForm = ({ onSubmit, isPending, error }: Props) => {
         formState: { errors },
     } = useForm<RegisterFormData>();
 
-    
-    const fieldErrors = getFieldErrors(error);
-    const hasFieldErrors = Object.keys(fieldErrors).length > 0;
-    const globalError = error && !hasFieldErrors
-         ? getErrorMessage(error, "Registration failed. Please try again.")
-         : null 
 
     const handleFormSubmit = ({ confirmPassword: _, ...data}: RegisterFormData) => {
          onSubmit(data, setError)
@@ -49,13 +41,6 @@ export const RegisterForm = ({ onSubmit, isPending, error }: Props) => {
           onSubmit={handleSubmit(handleFormSubmit)} 
           noValidate 
           className="space-y-4">
-           
-           {globalError && (
-              <div className="rounded-lg bg-destructive/10 border border-destructive/20
-                              px-4 py-3 text-sm text-destructive text-center">
-                 {globalError}
-              </div>
-           )} 
 
            <div className="space-y-1.5">
              <Label htmlFor="name">Full name</Label>

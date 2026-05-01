@@ -1,4 +1,5 @@
-import { Dumbbell } from "lucide-react"
+import { Dumbbell } from "lucide-react";
+import { Toaster } from "@/components/ui/sonner";
 
 type Props = {
     title: string;
@@ -8,10 +9,11 @@ type Props = {
 
 export default function AuthLayout  ({ children,title, subtitle }: Props)  {
   return (
-    <div className="min-h-svh flex items-center justify-center p-4 bg-background">
+    <div className="min-h-svh flex items-center justify-center p-4 bg-background">   
+         <Toaster position="top-center" richColors/>
       <div className="w-full max-w-md"> 
         {/* Card */}
-        <div className="rounded-2xl bg-card shadow-2xl border border-border/60 px-8 py-10">
+        <div className="rounded-2xl bg-card shadow-2xl border border-border/50 px-8 py-10">
           {/* Logo + Heading */}
           <div className="text-center mb-10">
             <div className="inline-flex p-4 items-center justify-center
