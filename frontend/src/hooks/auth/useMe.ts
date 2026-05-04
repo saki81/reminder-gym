@@ -5,27 +5,31 @@ import { useAuth } from "../shared/useAuth";
 
 
 export function useMe() {
-   const { login, setLoading } = useAuth();
+  const { login,logout, setLoading } = useAuth();
 
-   const { data, isFetched } = useQuery({
-       queryKey: ["me"],
-       queryFn: authApi.me,
+  const { data, isFetched, isError } = useQuery({
+    queryKey: ["me"],
+    queryFn: authApi.me,
+    retry: false,
+    staleTime: 1000 * 60 * 5,
+  });
 
-       retry: false,
-
-       staleTime: 1000 * 60 * 5,
-   });
-
-   useEffect(() => {
-    // Session valid → store user in context
-    if (data?.data?.user) {
-      login(data.data.user);
+  useEffect(() => {
+    if (data?.data) {
+      login(data.data);
+      return;
+      
     }
- 
-    // Query settled (success or error) → stop blocking the UI
+
+    if (isError) {
+      logout();
+     
+     setLoading(false)
+     return;
+    }
+
     if (isFetched) {
       setLoading(false);
     }
-  }, [data, isFetched]);
-
+  }, [data, isFetched , login, logout, setLoading, isError]);
 }
