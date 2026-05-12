@@ -31,7 +31,7 @@ export const register = async (req:Request, res:Response) => {
             name,
          }
       })
-
+        // generate jwt
         const token = signToken({
         userId: user.id
       })
@@ -43,8 +43,39 @@ export const register = async (req:Request, res:Response) => {
         maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
+    // delete old otp tokens
+    await prisma.emailVerificationToken.deleteMany({
+        where: { userId: user.id }
+    });
+    
+    // generate 6-digit number
+    const otp = Math.floor( 100000 + Math.random() * 900000).toString();
+
+    // hash otp
+    const hashedOtp = hashToken(otp);
+
+    // expires in 10 minutes
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 10);
+    
+    // save OTP
+    await prisma.emailVerificationToken.create({
+        data: {
+            token: hashedOtp,
+            userId: user.id,
+            expiresAt
+        }
+    });
+
+     // send verification email
+    await transporter.sendMail({
+      from: process.env.SENDER_EMAIL,
+      to: user.email,
+      subject: "Verify your email",
+      text: `Your verification code is: ${otp}`
+    });
+
     // Sending welcome email
-    const emailOptions = {
+   /* const emailOptions = {
         from: process.env.SENDER_EMAIL,
         to: email,
         subject: "Welcome to Reminder Gym",
@@ -52,9 +83,10 @@ export const register = async (req:Request, res:Response) => {
         has been created with email id: ${email}`
     }
 
-    await transporter.sendMail(emailOptions);
+    await transporter.sendMail(emailOptions);*/
 
-    res.json({ message: "User created" });
+   return  res.json({ message: "User created" });
+   
  } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error"})

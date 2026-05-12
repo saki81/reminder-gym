@@ -4,6 +4,7 @@ import { createContext, useState, useCallback, type ReactNode } from "react";
 import type { User } from "../types/index";
 
 
+
 export type AuthContextType = {
     user: User | null;
     isAuthenticated: boolean;
@@ -21,20 +22,6 @@ export function AuthProvider({children}: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-  /*  useEffect(() => {
-    const initAuth = async () => {
-        try {
-            const res = await authApi.me(); // 👈 provjeri session/cookie
-            setUser(res.data);
-        } catch (err) {
-            setUser(null);
-        } finally {
-            setIsLoading(false); // 👈 OVO JE KLJUČNO
-        }
-    };
-
-    initAuth();
-}, []);*/
 
     const login = useCallback((user: User | null) => { 
        setUser(user);

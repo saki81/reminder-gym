@@ -3,14 +3,16 @@ import type {
   Register,
   Login,
   ForgotPassword,
-  VerifyOtp,
   ResetPassword
 } from "../types/index";
 
 
 export const authApi = {
 
-    me: () => apiClient.get("/auth/me"),
+    me: async () => {
+    const res = await apiClient.get("/auth/me");
+    return res.data.user;
+   },
 
     register: (data: Register) =>
         apiClient.post("/auth/register", data),
@@ -23,8 +25,8 @@ export const authApi = {
     forgotPassword: (data: ForgotPassword) =>
         apiClient.post("/auth/forgot-password", data),
 
-    sendVerifyOtp: (data: VerifyOtp) => 
-        apiClient.post("/auth/send-verify-otp", data),
+    sendVerifyOtp: () => 
+        apiClient.post("/auth/send-verify-otp"),
 
     emailVerified: (otp: string) => 
         apiClient.post("/auth/verify-email", { otp }),

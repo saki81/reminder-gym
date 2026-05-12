@@ -5,7 +5,7 @@ export type User = {
   email: string;
   name?: string;
   role: Role;
-  gymId?: string;
+  gymId?: string | null;
   emailVerified: boolean;
 };
  
@@ -25,11 +25,7 @@ export type Register = {
 export type ForgotPassword = {
   email: string;
 };
- 
-export type VerifyOtp = {
-  email: string;
-  otp: string;
-};
+
  
 export type ResetPassword = {
   token: string;

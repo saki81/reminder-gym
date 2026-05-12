@@ -5,6 +5,20 @@ import { useAuth } from "../shared/useAuth";
 
 
 export function useMe() {
+
+  /*return useQuery({
+    queryKey: ["me"],
+
+    queryFn: async () => {
+      const res = await authApi.me();
+      return res.data.user;
+    },
+
+    retry: false,
+
+    staleTime: 1000 * 60 * 5,
+  });*/
+ 
   const { login,logout, setLoading } = useAuth();
 
   const { data, isFetched, isError } = useQuery({
@@ -33,3 +47,16 @@ export function useMe() {
     }
   }, [data, isFetched , login, logout, setLoading, isError]);
 }
+
+/*export function useMe() {
+  return useQuery({
+    queryKey: ["me"],
+    queryFn: async () => {
+      const res = await authApi.me();
+      return res.data.user;
+    },
+    retry: false,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  });
+}*/

@@ -40,6 +40,8 @@ import { NotFoundPage } from "../pages/NotFoundPage";
 import { UnauthorizedPage } from "../pages/UnauthorizedPage";
 
 
+
+
 export function AppRouter() {
    return( 
     <Routes>
@@ -72,14 +74,19 @@ export function AppRouter() {
             </AuthLayout>
           }
          />
-        <Route
+      
+     
+         <Route
           path="/verify-otp"
           element={
-            <AuthLayout title="Verify your email" subtitle="Enter the 6-digit code we sent you">
+           <AuthLayout title="Verify your email" subtitle="Enter the 6-digit code we sent you">
                 <VerifyOtpPage />
-            </AuthLayout>
-          } 
-         />
+           </AuthLayout>
+         }
+        />
+     
+
+ 
         <Route 
           path="/reset-password"
           element={
@@ -91,6 +98,8 @@ export function AppRouter() {
         
         {/* Protected authenticated users only*/}
         <Route element={<ProtectedRoute />}>
+
+     
           
           {/* Gym creation auth but no gym yet*/}
           <Route path="/gym/create" element={<CreateGymPage />}/>
