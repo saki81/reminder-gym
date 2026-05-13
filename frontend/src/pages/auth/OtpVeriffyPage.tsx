@@ -1,4 +1,4 @@
-import { Link, useLocation, Navigate } from "react-router-dom";
+import { Link, useLocation, Navigate, useNavigate } from "react-router-dom";
 import { OtpVerificationForm }          from "@/components/auth/OtpVerificationForm";
 import { useSendVerifyOtp }                 from "@/hooks/auth/useSendVerifyOtp";
 import { useVerifyEmail } from "@/hooks/auth/useVerifyEmail";
@@ -11,28 +11,56 @@ import { getErrorMessage }              from "@/hooks/shared/useFieldErrors";
 export const VerifyOtpPage = () => {
 //  const { user } = useAuth();
   const location = useLocation();
- // const navigate = useNavigate()
+  const navigate = useNavigate()
   const toast = useToast();
 
-  
+  // state from navigation
   const email = location.state?.email;
-  const fromRegister = location.state?.fromRegister;
+ // const fromRegister = location.state?.fromRegister;
+  // register or reset-password
+  const type = location.state?.type;
 
+  const fromRegister = type === "register";
+  const fromResetPassword = type ==="reset-password";
+ 
   const { mutate: sendOtp, isPending: isResending } = useSendVerifyOtp()
   const { mutate: emailVerified, isPending } = useVerifyEmail();
 
-   if (!fromRegister) {
+   if (!type) {
     return <Navigate to="/login" replace />;
   }
 
   const handleSubmit = (otp: string) => {
-      emailVerified(otp, {
-            onError: (err) =>
-              toast.error(getErrorMessage(err, "Invalid or expired code. Try again.")),
 
+    // register flow
+    if (fromRegister) { 
+       
+        emailVerified(otp, {
+
+        onError: (err) =>
+
+          toast.error(
+            getErrorMessage(
+              err,
+              "Invalid or expired code. Try again."
+            )
+          ),
+      });
+
+      return;
+  }
+
+  // reset password flow
+  if (fromResetPassword) {
+     
+      navigate("/reset-password", {
+        replace: true,
+
+        state: { otp, email }
       })
-  };
-
+     }
+      return;
+  }
 
   return (
     <>

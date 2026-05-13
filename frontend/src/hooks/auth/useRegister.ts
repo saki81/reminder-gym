@@ -15,12 +15,13 @@ export function useRegister() {
         onSuccess: (_, data ) => {
           
              toast.info("Verification code sent to your email");
-            navigate("/verify-otp", {
+             navigate("/verify-otp", {
+                
                 replace: true,
-                state: { email: data.email,fromRegister: true,
-                 },
+                state: { email: data.email, type: "register", },
             
             })
+            
         }
     })
 }

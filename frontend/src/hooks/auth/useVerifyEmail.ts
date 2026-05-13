@@ -17,12 +17,14 @@ export function useVerifyEmail() {
 
       onSuccess: async () => {
 
+     
        const user = await queryClient.fetchQuery({
          queryKey: ["me"],
          queryFn: authApi.me
     });
 
     login(user);
+    
 
   console.log("UPDATED USER:", user);
   console.log("gymId:", user?.gymId);
@@ -32,12 +34,16 @@ export function useVerifyEmail() {
 
   if (!user.emailVerified) return;
 
+
+
   if (!user.gymId) {
     navigate("/gym/create", { replace: true });
     return;
   }
 
   navigate("/dashboard", { replace: true });
+
+  
    }
  });
 }

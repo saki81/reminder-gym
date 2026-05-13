@@ -32,7 +32,7 @@ export const RegisterForm = ({ onSubmit, isPending }: Props) => {
     } = useForm<RegisterFormData>();
 
 
-    const handleFormSubmit = ({ confirmPassword: _, ...data}: RegisterFormData) => {
+const handleFormSubmit = ({ confirmPassword: _, ...data}: RegisterFormData) => {
          onSubmit(data, setError)
     }
 

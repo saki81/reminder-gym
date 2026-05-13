@@ -6,18 +6,6 @@ import { useAuth } from "../shared/useAuth";
 
 export function useMe() {
 
-  /*return useQuery({
-    queryKey: ["me"],
-
-    queryFn: async () => {
-      const res = await authApi.me();
-      return res.data.user;
-    },
-
-    retry: false,
-
-    staleTime: 1000 * 60 * 5,
-  });*/
  
   const { login,logout, setLoading } = useAuth();
 
@@ -29,8 +17,8 @@ export function useMe() {
   });
 
   useEffect(() => {
-    if (data?.data) {
-      login(data.data);
+    if (data) {
+      login(data);
       return;
       
     }

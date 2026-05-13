@@ -74,17 +74,6 @@ export const register = async (req:Request, res:Response) => {
       text: `Your verification code is: ${otp}`
     });
 
-    // Sending welcome email
-   /* const emailOptions = {
-        from: process.env.SENDER_EMAIL,
-        to: email,
-        subject: "Welcome to Reminder Gym",
-        text: `Welcome to Reminder Gym application. Your account 
-        has been created with email id: ${email}`
-    }
-
-    await transporter.sendMail(emailOptions);*/
-
    return  res.json({ message: "User created" });
    
  } catch (error) {
@@ -300,7 +289,7 @@ export const forgotPassword = async (req:Request, res:Response) => {
         });
 
         if (!user) {
-            return res.json({message: "If the email exists, reset link has been sent" });
+            return res.json({message: "If the email exists a reset code has been sent" });
         }
 
         // delete old tokens
@@ -308,13 +297,19 @@ export const forgotPassword = async (req:Request, res:Response) => {
             where: { userId: user.id }
         });
 
-        // generate token
-        const resetToken = generateResetToken();
-        const hashedToken = hashToken(resetToken);
+         // generate 6-digit otp
+         const otp = Math.floor(
+            100000 + Math.random() * 900000
+         ).toString();
 
-        // expiration 30 min
-        const expiresAt = new Date(Date.now() + 1000 * 60 * 30);
+        //hash token
+        
+        const hashedToken = hashToken(otp);
 
+        // expiration 10 min
+        const expiresAt = new Date( Date.now() + 1000 * 60 * 10 );
+        
+        // save token
         await prisma.passwordResetToken.create({
             data: {
                 token: hashedToken,
@@ -322,12 +317,17 @@ export const forgotPassword = async (req:Request, res:Response) => {
                 expiresAt
             }
         });
-
-        const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
         
-        console.log("RESET LINK", resetUrl);
+         // send email
+         await transporter.sendMail({
+           from: process.env.SENDER_EMAIL,
+           to: user.email,
+           subject: "Password Reset Code",
+           text: `Your password reset code is: ${otp}`
+        });
+        
 
-        return res.json({ message: "If the email exists, a reset link has been sent."});
+        return res.json({ message: "If the email exists, a reset code has been sent"});
         
     } catch (error) {
 
