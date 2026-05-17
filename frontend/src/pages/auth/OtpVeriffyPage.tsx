@@ -4,27 +4,28 @@ import { useSendVerifyOtp }                 from "@/hooks/auth/useSendVerifyOtp"
 import { useVerifyEmail } from "@/hooks/auth/useVerifyEmail";
 import { useToast }                     from "@/hooks/shared/useToast";
 import { getErrorMessage }              from "@/hooks/shared/useFieldErrors";
-
+import { useVerifyResetOtp } from "@/hooks/auth/useVerifyResetOtp";
 
 
 
 export const VerifyOtpPage = () => {
-//  const { user } = useAuth();
+
   const location = useLocation();
   const navigate = useNavigate()
   const toast = useToast();
 
   // state from navigation
   const email = location.state?.email;
- // const fromRegister = location.state?.fromRegister;
+
   // register or reset-password
   const type = location.state?.type;
 
   const fromRegister = type === "register";
   const fromResetPassword = type ==="reset-password";
  
-  const { mutate: sendOtp, isPending: isResending } = useSendVerifyOtp()
-  const { mutate: emailVerified, isPending } = useVerifyEmail();
+  const { mutate: sendOtp, isPending: isResending } = useSendVerifyOtp();
+  const { mutate: verifyResetOtp,  isPending: isVerifyingReset } = useVerifyResetOtp();
+  const { mutate: emailVerified, isPending: isVerifyingEmail} = useVerifyEmail();
 
    if (!type) {
     return <Navigate to="/login" replace />;
@@ -52,15 +53,22 @@ export const VerifyOtpPage = () => {
 
   // reset password flow
   if (fromResetPassword) {
-     
-      navigate("/reset-password", {
-        replace: true,
-
-        state: { otp, email }
-      })
-     }
-      return;
-  }
+      verifyResetOtp({otp}, {
+       onSuccess: (data) => {
+          navigate("/reset-password", {
+            replace: true,
+            state: {
+              token: data.resetToken,
+              email
+            }
+          })
+       },
+         onError: (err) =>
+      toast.error(getErrorMessage(err, "Invalid or expired code."))
+     })
+     return
+     } 
+    };
 
   return (
     <>
@@ -75,7 +83,7 @@ export const VerifyOtpPage = () => {
       <OtpVerificationForm
         onSubmit={handleSubmit}
         onResend={() => sendOtp()}
-        isPending={isPending}
+        isPending={isVerifyingEmail || isVerifyingReset}
         isResending={isResending}
       
       />

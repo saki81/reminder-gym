@@ -31,6 +31,11 @@ export const authApi = {
     emailVerified: (otp: string) => 
         apiClient.post("/auth/verify-email", { otp }),
 
+    verifyResetOtp: async (data: { otp: string }) => {
+    const res = await apiClient.post("/auth/verify-reset-otp", data);
+    return res.data;
+  },
+
     resetPassword: (data: ResetPassword) => 
         apiClient.post("/auth/reset-password", data)
 }

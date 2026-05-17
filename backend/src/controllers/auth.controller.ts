@@ -233,7 +233,53 @@ export const verifyEmail = async (req:Request, res:Response) => {
    } catch (error) {
        return res.status(500).json({ message: "Server error" });
    }
-}
+};
+
+export const verifyResetOtp = async (req: Request, res: Response) => {
+  const { otp } = req.body;
+
+  try {
+    const hashedOtp = hashToken(otp);
+
+    const resetToken = await prisma.passwordResetToken.findUnique({
+      where: { token: hashedOtp }
+    });
+
+    if (!resetToken) {
+      return res.status(400).json({ message: "Invalid code" });
+    }
+
+    if (resetToken.expiresAt < new Date()) {
+      return res.status(400).json({ message: "Code expired" });
+    }
+
+    
+    await prisma.passwordResetToken.delete({
+      where: { token: hashedOtp }
+    });
+
+    
+    const resetSessionToken = crypto.randomUUID();
+
+    const hashedSessionToken = hashToken(resetSessionToken)
+
+    await prisma.passwordResetSession.create({
+      data: {
+        token: hashedSessionToken,
+        userId: resetToken.userId,
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000)
+      }
+    });
+
+    return res.json({
+      success: true,
+      resetToken: resetSessionToken
+    });
+
+  } catch (error) {
+    return res.status(500).json({ message: "Server error" });
+  }
+};
 
 export const resetPassword = async (req:Request, res:Response) => {
     
@@ -243,9 +289,14 @@ export const resetPassword = async (req:Request, res:Response) => {
         
         const hashedToken = hashToken(token);
 
-        const resetToken = await prisma.passwordResetToken.findUnique({
+        console.log("INPUT TOKEN:", token);
+console.log("HASHED TOKEN:", hashToken(token));
+
+        const resetToken = await prisma.passwordResetSession.findUnique({
             where: { token: hashedToken }
         });
+
+        console.log("FOUND SESSION:", resetToken);
 
         if (!resetToken) {
             return res.status(400).json({ message: "Invalid or expired token" })
@@ -264,7 +315,7 @@ export const resetPassword = async (req:Request, res:Response) => {
             }
         });
 
-        await prisma.passwordResetToken.delete({
+        await prisma.passwordResetSession.delete({
             where: { token: hashedToken }
         });
 

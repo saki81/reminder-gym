@@ -7,8 +7,9 @@ export default function App() {
   useMe();
   return ( 
     <>
-     <AppRouter/> 
-    {/* <Toaster /> */}
+     <AppRouter/>
+     <Toaster position="top-center" richColors /> 
+   
     </>
  )
 }

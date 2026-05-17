@@ -36,15 +36,3 @@ export function useMe() {
   }, [data, isFetched , login, logout, setLoading, isError]);
 }
 
-/*export function useMe() {
-  return useQuery({
-    queryKey: ["me"],
-    queryFn: async () => {
-      const res = await authApi.me();
-      return res.data.user;
-    },
-    retry: false,
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
-  });
-}*/

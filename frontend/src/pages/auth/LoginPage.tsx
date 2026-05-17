@@ -1,30 +1,18 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { useLogin } from "@/hooks/auth/useLogin";
 import { useToast } from "@/hooks/shared/useToast";
 import { applyFieldErrors, getErrorMessage, getFieldErrors } from "@/hooks/shared/useFieldErrors";
-
 import type { Login } from "@/types";
 import type { UseFormSetError } from "react-hook-form";
-import { useEffect } from "react";
+
 
 
 export const LoginPage = () => {
   const { mutate: login, isPending } = useLogin();
-  const location = useLocation();
-  const navigate = useNavigate();
+
   const toast = useToast();
 
-  // Prikazuje success poruku ako je korisnik stigao ovdje nakon reset passworda
-  const resetSuccess = location.state?.resetSuccess as boolean | undefined;
-
-  useEffect(()=> {
-     if (resetSuccess) {
-        toast.success("Password reset successfully. Sign in below");
-        // Clear state from history
-        navigate(location.pathname, { replace: true, state: {}})
-     }
-  }, [resetSuccess, navigate, location.pathname])
 
   const handleSubmit = (data: Login, setError: UseFormSetError<Login>) => {
       
@@ -46,12 +34,6 @@ export const LoginPage = () => {
 
   return (
      <>
-    {/*  {resetSuccess && (() => {
-         toast.success("Password reset successfuly. Sign in below");
-         return null;
-      })
-     } */}
-
        <LoginForm
          onSubmit={handleSubmit}
          isPending={isPending}
