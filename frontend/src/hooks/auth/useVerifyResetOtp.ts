@@ -12,10 +12,8 @@ export function useVerifyResetOtp() {
       
       const resetToken = data.resetToken;
 
-      
-  console.log("RESET TOKEN:", resetToken);
+      console.log("RESET TOKEN:", resetToken);
 
-      
       navigate("/reset-password", {
         state: {token: resetToken }
       });

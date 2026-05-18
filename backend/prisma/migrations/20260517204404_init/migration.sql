@@ -43,6 +43,17 @@ CREATE TABLE "PasswordResetToken" (
 );
 
 -- CreateTable
+CREATE TABLE "PasswordResetSession" (
+    "id" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "PasswordResetSession_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "EmailVerificationToken" (
     "id" TEXT NOT NULL,
     "token" TEXT NOT NULL,
@@ -98,7 +109,7 @@ CREATE TABLE "Maintenance" (
 -- CreateTable
 CREATE TABLE "Gym" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "gymName" TEXT NOT NULL,
     "city" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -115,13 +126,10 @@ CREATE INDEX "User_email_idx" ON "User"("email");
 CREATE INDEX "User_gymId_idx" ON "User"("gymId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Admin_userId_key" ON "Admin"("userId");
-
--- CreateIndex
-CREATE INDEX "Admin_userId_gymId_idx" ON "Admin"("userId", "gymId");
-
--- CreateIndex
 CREATE INDEX "Admin_gymId_idx" ON "Admin"("gymId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Admin_userId_gymId_key" ON "Admin"("userId", "gymId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "PasswordResetToken_token_key" ON "PasswordResetToken"("token");
@@ -130,10 +138,31 @@ CREATE UNIQUE INDEX "PasswordResetToken_token_key" ON "PasswordResetToken"("toke
 CREATE INDEX "PasswordResetToken_token_idx" ON "PasswordResetToken"("token");
 
 -- CreateIndex
+CREATE INDEX "PasswordResetToken_userId_idx" ON "PasswordResetToken"("userId");
+
+-- CreateIndex
+CREATE INDEX "PasswordResetToken_userId_expiresAt_idx" ON "PasswordResetToken"("userId", "expiresAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PasswordResetSession_token_key" ON "PasswordResetSession"("token");
+
+-- CreateIndex
+CREATE INDEX "PasswordResetSession_token_idx" ON "PasswordResetSession"("token");
+
+-- CreateIndex
+CREATE INDEX "PasswordResetSession_userId_idx" ON "PasswordResetSession"("userId");
+
+-- CreateIndex
+CREATE INDEX "PasswordResetSession_userId_expiresAt_idx" ON "PasswordResetSession"("userId", "expiresAt");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "EmailVerificationToken_token_key" ON "EmailVerificationToken"("token");
 
 -- CreateIndex
 CREATE INDEX "EmailVerificationToken_token_idx" ON "EmailVerificationToken"("token");
+
+-- CreateIndex
+CREATE INDEX "EmailVerificationToken_userId_idx" ON "EmailVerificationToken"("userId");
 
 -- CreateIndex
 CREATE INDEX "Equipment_userId_idx" ON "Equipment"("userId");
@@ -160,10 +189,13 @@ ALTER TABLE "User" ADD CONSTRAINT "User_gymId_fkey" FOREIGN KEY ("gymId") REFERE
 ALTER TABLE "Admin" ADD CONSTRAINT "Admin_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Admin" ADD CONSTRAINT "Admin_gymId_fkey" FOREIGN KEY ("gymId") REFERENCES "Gym"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Admin" ADD CONSTRAINT "Admin_gymId_fkey" FOREIGN KEY ("gymId") REFERENCES "Gym"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PasswordResetToken" ADD CONSTRAINT "PasswordResetToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PasswordResetSession" ADD CONSTRAINT "PasswordResetSession_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "EmailVerificationToken" ADD CONSTRAINT "EmailVerificationToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

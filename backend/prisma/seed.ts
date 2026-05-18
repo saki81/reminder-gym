@@ -7,6 +7,19 @@ const prisma = new PrismaClient();
 async function main() {
   const password = await bcrypt.hash(process.env.ADMIN_PASSWORD!, 10);
 
+   const gym = await prisma.gym.upsert({
+    where: {
+      id: "ygym"
+    },
+    update: {},
+    create: {
+      id: "ygym",
+      gymName: "Maximus",
+      city: "Teslic"
+    }
+  });
+
+
   const adminUser = await prisma.user.upsert({
     where: { email: process.env.ADMIN_EMAIL! },
     update: {},
@@ -23,14 +36,14 @@ async function main() {
     where: {
       admin_user_gym_unique: {
         userId: adminUser.id,
-        gymId: "GLOBAL",
+        gymId: gym.id,
       },
     },
     update: {},
     create: {
       userId: adminUser.id,
       role: AdminRole.ADMIN,
-      gymId: "GLOBAL",
+      gymId: gym.id,
     },
   });
 
@@ -46,9 +59,11 @@ async function main() {
     await prisma.category.upsert({
       where: { name },
       update: {},
-      create: { name, gymId: null },
+      create: { name, gymId: gym.id },
     });
   }
+
+  console.log("📦 Categories seeded");
 
   console.log("✅ Seed completed");
 }
