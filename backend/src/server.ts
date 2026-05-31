@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.route.js";
+import gymRoutes from "./routes/gym.route.js"
 
 
 dotenv.config();
@@ -24,7 +25,8 @@ app.use(cookieParser());
 
 
 
-app.use("/api/auth", authRoutes)
+app.use("/api/auth", authRoutes);
+app.use("/api/gym", gymRoutes)
 
 
 const PORT = process.env.PORT || 5000;

@@ -17,18 +17,17 @@ model User {
   password        String
   name            String?
   
-  gymId           String?
-  gym             Gym?      @relation(fields: [gymId], references: [id])
+  activeGymId           String?
+  activeGym             Gym?      @relation("ActiveGymId",fields: [activeGymId], references: [id])
 
-
+  
   emailVerified   Boolean @default(false)
   emailVerifiedAt DateTime?
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-//  admin           Admin?
- admins Admin[]
+  admins          Admin[]
 
   equipments      Equipment[]
   maintenances    Maintenance[]
@@ -38,8 +37,8 @@ model User {
   resetSessions     PasswordResetSession[]
 
   @@index([email])
+  @@index([activeGymId])
 
-  @@index([gymId])
 }
 
 
@@ -190,11 +189,14 @@ model Gym {
   gymName      String
   city         String?
 
-  users        User[]
+ 
   equipments   Equipment[]
   maintenances Maintenance[]
   categories   Category[]
+
   admins       Admin[]
+
+  activeUsers  User[] @relation("ActiveGymId")
 
   createdAt    DateTime    @default(now())
 }

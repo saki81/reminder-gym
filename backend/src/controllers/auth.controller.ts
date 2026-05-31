@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt"
 import { prisma } from "../lib/prisma.js";
 import { signToken } from "../utils/jwtToken.js";
-import { generateResetToken } from "../utils/generateToken.js";
 import { hashToken } from "../utils/hashToken.js";
 import  transporter  from "../config/nodemailer.js"
 
