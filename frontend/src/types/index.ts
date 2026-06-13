@@ -46,7 +46,15 @@ export type Gym = {
   name: string; 
   city?: string;
   craetedAt: string;
-}
+};
+
+export type CreateGym = {
+  gymName: string;
+  city?:   string;
+};
+ 
+export type UpdateGym = Partial<CreateGym>;
+
 
 // Equipment
 
