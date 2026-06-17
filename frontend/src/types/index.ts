@@ -43,7 +43,7 @@ export type ApiError = {
 
 export type Gym = {
   id: string;
-  name: string; 
+  gymName: string; 
   city?: string;
   craetedAt: string;
 };
