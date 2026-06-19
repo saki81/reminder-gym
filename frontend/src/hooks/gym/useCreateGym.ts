@@ -21,15 +21,15 @@ export function useCreateGym() {
     onSuccess: (res) => {
       const gym = res.data.gym;
  
-      // Lokalno updatujemo user sa activeGymId
+      // Lokal update user sa activeGymId
       if (user) {
         login({ ...user, gymId: gym.id });
       }
  
-      // Postavljamo aktivan gym u GymContext
+      //put activ gym in GymContext
       setCurrentGym(gym);
  
-      // Invalidujemo my-gyms query da se lista osvježi
+      // Invalid my-gyms query list refresh
       queryClient.invalidateQueries({ queryKey: ["my-gyms"] });
  
       toast.success(`${gym.gymName} created successfully!`);

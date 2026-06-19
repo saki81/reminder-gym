@@ -29,16 +29,16 @@ export function useDeleteGym() {
                     queryFn: gymApi.getMyGyms,
                 });
 
-                       const remainingGyms = result?.data?.gyms ?? [];
+             const remainingGyms = result?.data?.gyms ?? [];
  
             if (remainingGyms.length > 0) {
-              // Automatski switchamo na prvi preostali gym
+              // Automatic switch at first remaining gym
               const nextGym = remainingGyms[0];
               setCurrentGym(nextGym);
             if (user) login({ ...user, gymId: nextGym.id });
               toast.success("Gym deleted. Switched to another gym.");
             } else {
-              // Nema više gymova → šalji na kreiranje novog
+              
               clearGym();
               if (user) login({ ...user, gymId: undefined });
               toast.info("Gym deleted. Please create a new gym.");
