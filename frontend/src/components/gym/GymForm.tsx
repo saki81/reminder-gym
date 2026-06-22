@@ -39,6 +39,7 @@ export const GymForm = ({
              id="gymName"
              placeholder="e.g. Gym Name"
              aria-invalid={!!errors.gymName}
+             {...register("gymName")}
            />
            {errors.gymName && (
               <p className="textt-xs text-destructive">{errors.gymName.message}</p>
@@ -53,6 +54,7 @@ export const GymForm = ({
             <Input 
                id="city"
                placeholder="e.g. City"
+               aria-invalid={!!errors.city}
                {...register("city")}
             />
         </div>

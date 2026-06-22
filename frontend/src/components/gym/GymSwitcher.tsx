@@ -13,6 +13,7 @@ import { useMyGyms } from "@/hooks/gym/useMyGyms";
 import { useSwitchGym } from "@/hooks/gym/useGymSwitch";
 import { useGym } from "@/hooks/shared/useGym";
 import { useAuth } from "@/hooks/shared/useAuth";
+import type { Gym } from "@/types";
 
 
 export const GymSwitcher = () => {
@@ -50,7 +51,7 @@ export const GymSwitcher = () => {
  
         <DropdownMenuSeparator />
  
-        {gyms.map((gym: any) => {
+        {gyms.map((gym: Gym) => {
           const isActive = gym.id === currentGym.id;
           return (
             <DropdownMenuItem

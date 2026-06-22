@@ -47,7 +47,7 @@ export function AppRouter() {
     <Routes>
 
       {/* Route redirect */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />}/>
+      <Route path="/" element={<Navigate to="/gym" replace />}/>
 
       {/* Public auth routes */}
       <Route
@@ -104,6 +104,19 @@ export function AppRouter() {
           {/* Gym creation auth but no gym yet*/}
           <Route path="/gym/create" element={<CreateGymPage />}/>
 
+          <Route
+    path="/gym"
+    element={<Layout><GymPage /></Layout>}
+  />
+
+  {/* Gym settings — OWNER + ADMIN only, uvijek dostupno */}
+  <Route element={<RoleRoute allowedRoles={["OWNER", "ADMIN"]} />}>
+    <Route
+      path="/gym/settings"
+      element={<Layout><GymSettingsPage /></Layout>}
+    />
+     </Route>
+
           {/* Gym scoped routes requires gymId or Admin */}
           <Route element={<GymRoute />}>
             
@@ -128,18 +141,7 @@ export function AppRouter() {
               path="/categories"
               element={<Layout><CategoryPage /></Layout>}
              />
-            <Route
-              path="/gym"
-              element={<Layout><GymPage /></Layout>}
-             />
-
-            {/* Gym settings OWNER + ADMIN only  */}
-            <Route element={<RoleRoute allowedRoles={["OWNER", "ADMIN"]} />}>
-               <Route 
-                 path="/gym/settings"
-                 element={<Layout><GymSettingsPage /></Layout>}
-                 />
-            </Route>
+          
 
             {/* Admin routes per ADMIN ONLY */}
             <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>

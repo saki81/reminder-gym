@@ -35,7 +35,7 @@ export const register = async (req:Request, res:Response) => {
         userId: user.id
       })
 
-    res.cookie("token", token, {
+    res.cookie("accessToken", token, {
         httpOnly: true,
         secure: false,
         sameSite: "strict",
@@ -105,7 +105,7 @@ export const login = async (req:Request, res:Response) => {
         userId: user.id
     })
 
-    res.cookie("token", token, {
+    res.cookie("accessToken", token, {
       httpOnly: true,
       secure: false,/*process.env.NODE_ENV === "production",*/
       sameSite: "lax",
@@ -123,7 +123,7 @@ export const login = async (req:Request, res:Response) => {
 
 export const logout = async (req:Request, res:Response) => {
      
-    res.clearCookie("token", {
+    res.clearCookie("accessToken", {
         httpOnly: true,
         sameSite: 'strict',
         secure: process.env.NODE_ENV === "production"
@@ -289,7 +289,7 @@ export const resetPassword = async (req:Request, res:Response) => {
         const hashedToken = hashToken(token);
 
         console.log("INPUT TOKEN:", token);
-console.log("HASHED TOKEN:", hashToken(token));
+        console.log("HASHED TOKEN:", hashToken(token));
 
         const resetToken = await prisma.passwordResetSession.findUnique({
             where: { token: hashedToken }
@@ -389,12 +389,16 @@ export const getMe = async (req: Request, res: Response) => {
       
     const userId = req.user?.userId;
 
+    if (!userId) {
+          return res.status(401).json({ message: "Unauthorized - no userId" });
+}
+
     try {
         
         const user = await prisma.user.findUnique({
             where: { id: userId },
             include: {
-                gym: true,
+                activeGym: true,
                 admins: true
             }
         });
@@ -405,7 +409,7 @@ export const getMe = async (req: Request, res: Response) => {
 
         const { password, ...safeUser } = user;
 
-        res.json({ user: safeUser });
+       return res.json({ user: safeUser });
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }

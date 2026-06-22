@@ -27,12 +27,12 @@ export function useLogin() {
 
              toast.success(`Welcome back, ${user.name ?? user.email ?? ""}!`)
 
-             if (!user?.gymId) {
+          /*   if (!user?.gymId) {
                 navigate("/gym/create", { replace: true })
                 return;
-             }
+             }*/
             
-             navigate("/dashboard", { replace: true });
+             navigate("/gym", { replace: true });
         }
     });
 }

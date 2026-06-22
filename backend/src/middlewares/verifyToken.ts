@@ -3,7 +3,9 @@ import { verifyJwt } from "../utils/jwtToken.js";
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
      
-    const token = req.cookies?.token;
+    const token = req.cookies?.accessToken;
+
+    console.log("COOKIES:", req.cookies);
 
     if (!token) {
         return res.status(401).json({ message: "Unautorized" })
@@ -13,8 +15,9 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 try {
 
     const decoded = verifyJwt(token);
+    console.log("DECODED JWT:", decoded);
 
-    req.user = decoded;
+    req.user = decoded as { userId: string };
 
     next()
    } catch (error) {
