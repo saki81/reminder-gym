@@ -1,29 +1,25 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { gymApi } from "@/api/gymApi";
-import { useAuth } from "../shared/useAuth";
+import { useMyGyms } from "./useMyGyms";
 import { useGym } from "../shared/useGym";
 import { useToast } from "../shared/useToast";
 import  type { Gym } from "@/types";
 
 
 export function useSwitchGym() {
-    const { user, login } = useAuth();
     const { setCurrentGym } = useGym();
+    const { gyms } = useMyGyms();
     const queryClient = useQueryClient();
     const toast = useToast();
 
     return useMutation({
         mutationFn: (gymId: string) => gymApi.switchGym(gymId),
 
-        onSuccess: (_res, gymId, context) => {
+        onSuccess: (_res, gymId) => {
 
-            const gym = context as Gym;
+            const gym = gyms.find((g:Gym) => g.id === gymId)
 
-            if (user) {
-                login({ ...user, gymId });
-            }
-
-            setCurrentGym(gym);
+            if (gym) setCurrentGym(gym);
 
             queryClient.invalidateQueries({ queryKey: ["equipment"] });
             queryClient.invalidateQueries({ queryKey: ["maintenance"] });

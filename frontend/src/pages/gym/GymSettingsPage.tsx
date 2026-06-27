@@ -12,18 +12,18 @@ import {
   getErrorMessage,
   getFieldErrors,
 } from "@/hooks/shared/useFieldErrors";
-import type { CreateGym }       from "@/types";
+import type { CreateGym, UpdateGym }       from "@/types";
 import type { UseFormSetError } from "react-hook-form";
 
 
 export const GymSettingsPage = () => {
-    const { currentGym }                               = useGym();
+  const { currentGym } = useGym();
   const { mutate: updateGym, isPending: isUpdating } = useUpdateGym();
   const { mutate: deleteGym, isPending: isDeleting } = useDeleteGym();
-  const toast                                        = useToast();
-  const [confirmDelete, setConfirmDelete]            = useState(false);
+  const toast = useToast();
+  const [confirmDelete, setConfirmDelete] = useState(false);
  
-  if (!currentGym) {
+if (!currentGym) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 size={28} className="animate-spin text-primary" />
@@ -32,7 +32,7 @@ export const GymSettingsPage = () => {
   }
  
   const handleSubmit = (
-    data: CreateGym,
+    data: UpdateGym,
     setError: UseFormSetError<CreateGym>
   ) => {
     updateGym(data, {

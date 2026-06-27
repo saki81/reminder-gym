@@ -9,9 +9,9 @@ export default function Layout ({ children }: Props) {
   )
 }*/
 
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-//import { AppSidebar } from "./AppSidebar";
-//import { Navbar }     from "./Navbar";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "./AppSidebar";
+import { Navbar }     from "./Navbar";
 import { Toaster }    from "@/components/ui/sonner";
 import { useGym }     from "@/hooks/shared/useGym";
 
@@ -28,11 +28,11 @@ export default function Layout({ children }: Props) {
 
       <div className="flex h-svh w-full overflow-hidden">
 
-     {/*<AppSidebar /> */}
+      <AppSidebar /> 
 
         <div className="flex flex-1 flex-col overflow-hidden">
 
-      {/*   <Navbar gymName={currentGym?.gymName} /> */}
+        <Navbar />
 
           <main className="flex-1 overflow-y-auto p-4 lg:p-6">
             {children}

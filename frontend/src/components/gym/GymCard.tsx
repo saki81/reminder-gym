@@ -1,4 +1,5 @@
 import { Building2, Check } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -68,6 +69,7 @@ export const GymCard = ({
                </Button>
               )}
              {canManage && (
+              < Link to="/gym/settings">
                <Button
                  variant="ghost"
                  size="sm"
@@ -76,6 +78,7 @@ export const GymCard = ({
                 >
                 Settings
               </Button>
+              </Link>
              )}
             </div>
           </CardContent>

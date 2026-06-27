@@ -409,7 +409,18 @@ export const getMe = async (req: Request, res: Response) => {
 
         const { password, ...safeUser } = user;
 
-       return res.json({ user: safeUser });
+         const activeAdmin = user.admins.find(
+          (a) => a.gymId === user.activeGymId
+           ) ?? user.admins[0];
+
+    return res.json({
+      user: {
+        ...safeUser,
+        role: activeAdmin?.role ?? "STAFF", // ← ovo fali
+      },
+    });
+
+       
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }

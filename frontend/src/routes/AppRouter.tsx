@@ -110,12 +110,12 @@ export function AppRouter() {
   />
 
   {/* Gym settings — OWNER + ADMIN only, uvijek dostupno */}
-  <Route element={<RoleRoute allowedRoles={["OWNER", "ADMIN"]} />}>
+  <Route element={<RoleRoute allowedRoles={["OWNER", "ADMIN"]} />}> 
     <Route
       path="/gym/settings"
       element={<Layout><GymSettingsPage /></Layout>}
     />
-     </Route>
+     </Route> 
 
           {/* Gym scoped routes requires gymId or Admin */}
           <Route element={<GymRoute />}>

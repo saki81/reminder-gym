@@ -37,7 +37,7 @@ export const GymPage = () => {
                  : `You manage ${gyms.length} gyms`}
             </p>
           </div>
-        {/* {hasRole(["OWNER", "ADMIN"]) && ( */}
+        {hasRole(["OWNER", "ADMIN"]) && ( 
              <Button
                variant="outline"
                size="sm"
@@ -47,9 +47,8 @@ export const GymPage = () => {
               <Plus size={15}/>
                  New gym
              </Button>
-      {/*    )} */}
+         )} 
        </div>
-       <GymSwitcher />
 
        <div className="space-y-3">
           {gyms.map((gym: Gym) => (
@@ -59,7 +58,7 @@ export const GymPage = () => {
                isActive={currentGym?.id === gym.id}
                isSwitching={isPending}
                canManage={hasRole(["OWNER", "ADMIN"])}
-               onSwitch={() => switchGym(gym.id, { context: gym } as any)}
+               onSwitch={() => switchGym(gym?.id)}
                onSettings={() => navigate("/gym/settings")}
 />
           ))}
