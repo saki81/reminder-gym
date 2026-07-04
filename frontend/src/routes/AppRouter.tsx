@@ -31,7 +31,6 @@ import { CategoryPage } from "../pages/category/CategoryPage";
  
 // Admin pages
 import { AdminPage } from "../pages/admin/AdminPage";
-import { AdminDashboardPage } from "../pages/admin/AdminDashboardPage";
 import { AdminGymsPage } from "../pages/admin/AdminGymsPage";
 import { AdminUsersPage } from "../pages/admin/AdminUsersPage";
 
@@ -98,24 +97,22 @@ export function AppRouter() {
         
         {/* Protected authenticated users only*/}
         <Route element={<ProtectedRoute />}>
-
-     
-          
+ 
           {/* Gym creation auth but no gym yet*/}
           <Route path="/gym/create" element={<CreateGymPage />}/>
 
           <Route
-    path="/gym"
-    element={<Layout><GymPage /></Layout>}
-  />
+             path="/gym"
+             element={<Layout><GymPage /></Layout>}
+           />
 
-  {/* Gym settings — OWNER + ADMIN only, uvijek dostupno */}
-  <Route element={<RoleRoute allowedRoles={["OWNER", "ADMIN"]} />}> 
-    <Route
-      path="/gym/settings"
-      element={<Layout><GymSettingsPage /></Layout>}
-    />
-     </Route> 
+          {/* Admin routes per ADMIN ONLY */}
+            <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
+               <Route path="/admin" element={<AdminLayout><AdminPage /></AdminLayout>} />
+               <Route path="/admin/gyms" element={<AdminLayout><AdminGymsPage /></AdminLayout>} />
+               <Route path="/admin/users" element={<AdminLayout><AdminUsersPage /></AdminLayout>} />
+            </Route>
+       
 
           {/* Gym scoped routes requires gymId or Admin */}
           <Route element={<GymRoute />}>
@@ -142,15 +139,14 @@ export function AppRouter() {
               element={<Layout><CategoryPage /></Layout>}
              />
           
-
-            {/* Admin routes per ADMIN ONLY */}
-            <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
-               <Route path="/admin" element={<AdminLayout><AdminPage /></AdminLayout>} />
-               <Route path="/admin/dashboard" element={<AdminLayout><AdminDashboardPage /></AdminLayout>} />
-               <Route path="/admin/gyms" element={<AdminLayout><AdminGymsPage /></AdminLayout>} />
-               <Route path="/admin/users" element={<AdminLayout><AdminUsersPage /></AdminLayout>} />
-            </Route>
-
+            {/* Gym settings — OWNER + ADMIN */}
+            <Route element={<RoleRoute allowedRoles={["OWNER", "ADMIN"]} />}> 
+             <Route
+               path="/gym/settings"
+               element={<Layout><GymSettingsPage /></Layout>}
+             />
+            
+            </Route> 
           </Route>
         </Route>
 

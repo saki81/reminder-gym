@@ -6,7 +6,6 @@ import { useMyGyms } from "@/hooks/gym/useMyGyms";
 import { useSwitchGym } from "@/hooks/gym/useGymSwitch";
 import { useGym } from "@/hooks/shared/useGym";
 import { useAuth } from "@/hooks/shared/useAuth";
-import { GymSwitcher } from "@/components/gym/GymSwitcher";
 import type { Gym } from "@/types";
 
 

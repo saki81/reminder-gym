@@ -7,19 +7,18 @@ const prisma = new PrismaClient();
 async function main() {
   const password = await bcrypt.hash(process.env.ADMIN_PASSWORD!, 10);
 
-   const gym = await prisma.gym.upsert({
-    where: {
-      id: "ygym"
-    },
+  // Gym
+  const gym = await prisma.gym.upsert({
+    where: { id: "ygym" },
     update: {},
     create: {
       id: "ygym",
       gymName: "Maximus",
-      city: "Teslic"
-    }
+      city: "Teslic",
+    },
   });
 
-
+  // Admin user
   const adminUser = await prisma.user.upsert({
     where: { email: process.env.ADMIN_EMAIL! },
     update: {},
@@ -28,10 +27,15 @@ async function main() {
       password,
       name: "Platform Admin",
       emailVerified: true,
-      gymId: null,
+
+      // Ako želiš da ovaj korisnik odmah ima aktivnu teretanu
+      activeGymId: gym.id,
+
+     
     },
   });
 
+  // Admin za određeni gym
   await prisma.admin.upsert({
     where: {
       admin_user_gym_unique: {
@@ -42,10 +46,32 @@ async function main() {
     update: {},
     create: {
       userId: adminUser.id,
-      role: AdminRole.ADMIN,
       gymId: gym.id,
+      role: AdminRole.ADMIN,
     },
   });
+
+  // Platform admin
+  const existingPlatformAdmin = await prisma.admin.findFirst({
+    where: {
+      userId: adminUser.id,
+      gymId: null,
+    },
+  });
+
+  if (!existingPlatformAdmin) {
+    await prisma.admin.create({
+      data: {
+        userId: adminUser.id,
+        gymId: null,
+        role: AdminRole.ADMIN,
+      },
+    });
+
+    console.log("✅ Platform admin created");
+  } else {
+    console.log("ℹ️ Platform admin already exists");
+  }
 
   const defaultCategories = [
     "Cardio Machines",
@@ -59,12 +85,14 @@ async function main() {
     await prisma.category.upsert({
       where: { name },
       update: {},
-      create: { name, gymId: gym.id },
+      create: {
+        name,
+        gymId: gym.id,
+      },
     });
   }
 
   console.log("📦 Categories seeded");
-
   console.log("✅ Seed completed");
 }
 

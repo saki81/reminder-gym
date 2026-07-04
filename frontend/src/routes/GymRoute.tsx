@@ -17,10 +17,10 @@ export function GymRoute(){
 
 
  // ADMIN bypasses gym requirement — they manage the whole platform
-   if (hasRole(["ADMIN" ])) return <Outlet />
+   if (hasRole(["ADMIN", "OWNER" ])) return <Outlet />
 
    // User has a gym → proceed
-   if (/*user?.gymId*/user && user.gymId !== undefined) return <Outlet />
+   if (/*user?.gymId*/user && user.activeGymId !== undefined) return <Outlet />
 
    return <Navigate to="/gym/create" replace />
 }

@@ -5,7 +5,7 @@ export type User = {
   email: string;
   name?: string;
   role: Role;
-  gymId?: string | null;
+  activeGymId?: string | null;
   emailVerified: boolean;
 };
  

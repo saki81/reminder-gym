@@ -409,14 +409,15 @@ export const getMe = async (req: Request, res: Response) => {
 
         const { password, ...safeUser } = user;
 
-         const activeAdmin = user.admins.find(
-          (a) => a.gymId === user.activeGymId
-           ) ?? user.admins[0];
+        const activeAdmin = user.admins.find((a) => a.role === "ADMIN" && a.gymId === null) ??
+                            user.admins.find((a) => a.role === "ADMIN") ??
+                            user.admins.find((a) => a.gymId === user.activeGymId) ??
+                            user.admins[0];
 
     return res.json({
       user: {
         ...safeUser,
-        role: activeAdmin?.role ?? "STAFF", // ← ovo fali
+        role: activeAdmin?.role ?? "STAFF", 
       },
     });
 

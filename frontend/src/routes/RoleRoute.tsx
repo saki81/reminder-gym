@@ -6,7 +6,10 @@ type Props = {
 };
  
 export function RoleRoute({ allowedRoles }: Props) {
-  const { hasRole, isLoading } = useAuth();
+  const { hasRole, isLoading, user} = useAuth();
+
+    console.log("RoleRoute user:", user);
+    console.log("RoleRoute hasRole ADMIN:", hasRole(["ADMIN"]));
  
   // Still resolving — don't redirect yet
   if (isLoading) return null;

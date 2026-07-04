@@ -45,7 +45,7 @@ import { useAuth } from "../hooks/shared/useAuth";
 export function ProtectedRoute() {
   const { isAuthenticated, isLoading, user } = useAuth();
 
-
+  console.log(user);
   if (isLoading ) {
     return (
       <div className="min-h-svh flex items-center justify-center bg-background">

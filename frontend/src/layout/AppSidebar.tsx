@@ -35,7 +35,7 @@ import { Separator }              from "@/components/ui/separator";
 import { useAuth }   from "@/hooks/shared/useAuth";
 import { useLogout } from "@/hooks/auth/useLogout";
 
-// ─── Nav items ────────────────────────────────────────────────────────────────
+
 
 type NavItem = {
   to:     string;
@@ -58,11 +58,11 @@ const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-// ─── AppSidebar ───────────────────────────────────────────────────────────────
+//  AppSidebar
 
 export function AppSidebar() {
-  const { user, hasRole }                      = useAuth();
-  const { mutate: logout, isPending }          = useLogout();
+  const { user, hasRole } = useAuth();
+  const { mutate: logout, isPending } = useLogout();
 
   const visibleItems = NAV_ITEMS.filter(
     (item) => !item.roles || hasRole(item.roles)
@@ -75,7 +75,7 @@ export function AppSidebar() {
   return (
     <Sidebar>
 
-      {/* ── Header ─────────────────────────────────────────────── */}
+    
       <SidebarHeader className="border-b px-4 py-3">
         <div className="flex items-center gap-2.5">
           <div className="flex size-8 items-center justify-center
@@ -91,7 +91,7 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      {/* ── Nav ────────────────────────────────────────────────── */}
+     
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
@@ -108,7 +108,7 @@ export function AppSidebar() {
                           "flex items-center gap-3 rounded-lg px-3 py-2",
                           "text-sm transition-colors duration-150",
                           isActive
-                            ? "bg-primary text-primary-foreground font-medium"
+                            ? "bg-primary w-full text-primary-foreground font-medium"
                             : "text-muted-foreground hover:bg-accent hover:text-foreground",
                         ].join(" ")
                       }
@@ -124,7 +124,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* ── Footer — user info + logout ────────────────────────── */}
+   
       <SidebarFooter className="border-t p-3">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
