@@ -43,7 +43,7 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "../hooks/shared/useAuth";
 
 export function ProtectedRoute() {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isLoading, user } = useAuth();
 
   console.log(user);
   if (isLoading ) {
@@ -56,13 +56,11 @@ export function ProtectedRoute() {
       </div>
     );
   }
-
-  // not logged in
+ 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // email not verified
   if (!user?.emailVerified) {
     return <Navigate to="/verify-otp" replace />;
   }

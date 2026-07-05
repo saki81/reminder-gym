@@ -17,7 +17,6 @@ export function useVerifyEmail() {
 
       onSuccess: async () => {
 
-     
        const user = await queryClient.fetchQuery({
          queryKey: ["me"],
          queryFn: authApi.me
@@ -41,9 +40,8 @@ export function useVerifyEmail() {
     return;
   }
 
-  navigate("/dashboard", { replace: true });
-
-  
+     navigate("/dashboard", { replace: true });
+ 
    }
  });
 }

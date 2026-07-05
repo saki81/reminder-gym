@@ -18,7 +18,7 @@ export function useResetPassword () {
 
             navigate("/login", {
                 replace: true,
-              //  state: { resetSuccess: true },
+             
             })
         }
     });

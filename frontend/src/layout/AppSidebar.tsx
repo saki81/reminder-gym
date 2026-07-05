@@ -1,11 +1,4 @@
-// =============================================================================
-// layout/AppSidebar.tsx
-//
-// Shadcn Sidebar za sve autentifikovane korisnike.
-// Nav items filtrirani po roli — STAFF ne vidi Gym Settings ni Admin.
-// =============================================================================
-
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   Dumbbell,
@@ -30,7 +23,6 @@ import {
 } from "@/components/ui/sidebar";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator }              from "@/components/ui/separator";
 
 import { useAuth }   from "@/hooks/shared/useAuth";
 import { useLogout } from "@/hooks/auth/useLogout";
@@ -74,8 +66,6 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-
-    
       <SidebarHeader className="border-b px-4 py-3">
         <div className="flex items-center gap-2.5">
           <div className="flex size-8 items-center justify-center
@@ -155,7 +145,6 @@ export function AppSidebar() {
           </button>
         </div>
       </SidebarFooter>
-
     </Sidebar>
   );
 }

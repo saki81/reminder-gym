@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 export function GymRoute(){
    const { user, isLoading, hasRole } = useAuth();
 
-  // if (isLoading) return null;
+ 
    if (isLoading && user === undefined) {
     return (
       <div className="min-h-svh flex items-center justify-center bg-background">
@@ -20,7 +20,7 @@ export function GymRoute(){
    if (hasRole(["ADMIN", "OWNER" ])) return <Outlet />
 
    // User has a gym → proceed
-   if (/*user?.gymId*/user && user.activeGymId !== undefined) return <Outlet />
+   if (user && user.activeGymId !== undefined) return <Outlet />
 
    return <Navigate to="/gym/create" replace />
 }

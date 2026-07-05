@@ -25,22 +25,18 @@ export const Navbar = () => {
        : user?.email?.[0]?.toUpperCase() ?? "?";
     
     return (
-        <header className="sticky top-0 z-40 flex h-14 items-center gap-3
+      <header className="sticky top-0 z-40 flex h-14 items-center gap-3
                            border-b bg-card/80 backdrop-blur-sm px-4">
         
         {/* Mobile sidebar toggle */}
         <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
-
-        <Separator orientation="vertical" className="h-5"/>
-
+         <Separator orientation="vertical" className="h-5"/>
           <GymSwitcher />
-
               <div className="flex-1" />
  
-      {/* User dropdown */}
-      <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-2">
-          
+            {/* User dropdown */}
+           <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-2">
             <Avatar className="size-7">
               <AvatarFallback className="bg-primary text-primary-foreground
                                          text-xs font-semibold">
@@ -91,7 +87,6 @@ export const Navbar = () => {
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
-
-        </header>
+    </header>
     )
 }

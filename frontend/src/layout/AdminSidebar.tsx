@@ -35,7 +35,6 @@ export function AdminSidebar() {
    const { user } = useAuth();
    const { mutate: logout, isPending } = useLogout();
 
-   console.log("user role:", user?.role);
 
    const initials = user?.name
     ? user.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
@@ -43,20 +42,18 @@ export function AdminSidebar() {
 
 
     return (
-    <Sidebar className="border-r border-zinc-800 bg-zinc-900">
- 
-   
-      <SidebarHeader className="border-b border-zinc-800 px-4 py-3">
+    <Sidebar>
+      <SidebarHeader className="border-b px-4 py-3">
         <div className="flex items-center gap-2.5">
           <div className="flex size-8 items-center justify-center
                           rounded-lg bg-primary shrink-0">
             <Dumbbell size={16} color="white" strokeWidth={2.5} />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-zinc-100 truncate">
+            <p className="text-sm font-semibold truncate">
               Reminder Gym
             </p>
-            <p className="text-[11px] text-zinc-400 truncate">
+            <p className="text-[11px] text-muted-foreground truncate">
               Admin Panel
             </p>
           </div>
@@ -65,8 +62,7 @@ export function AdminSidebar() {
  
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-zinc-500 text-[11px]
-                                        uppercase tracking-wider">
+          <SidebarGroupLabel>
             Management
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -82,12 +78,12 @@ export function AdminSidebar() {
                           "flex items-center gap-3 rounded-lg px-3 py-2",
                           "text-sm transition-colors duration-150",
                           isActive
-                            ? "bg-primary text-primary-foreground font-medium"
-                            : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+                            ? "bg-primary w-full text-primary-foreground font-medium"
+                            : "text-muted-foreground hover:bg-accent hover:text-foreground",
                         ].join(" ")
                       }
                     >
-                      <item.icon size={16} className="shrink-0" />
+                      <item.icon size={17} className="shrink-0" />
                       <span>{item.label}</span>
                     </NavLink>
                   </SidebarMenuButton>
@@ -99,13 +95,12 @@ export function AdminSidebar() {
       </SidebarContent>
  
   
-      <SidebarFooter className="border-t border-zinc-800 p-3 space-y-3">
- 
+      <SidebarFooter className="border-t p-3">
         {/* Back to app */}
         <Link
           to="/gym"
-          className="flex items-center gap-2 text-xs text-zinc-400
-                     hover:text-zinc-100 transition-colors px-1"
+          className="flex items-center gap-2 text-sm text-muted-foreground
+                     hover:text-accent-foreground transition-colors px-1"
         >
           <ArrowLeft size={13} />
           Back to app
@@ -121,7 +116,7 @@ export function AdminSidebar() {
                 {initials}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-medium text-zinc-100 truncate">
+                <p className="text-xs font-medium truncate">
                   {user.name ?? "Admin"}
                 </p>
                 <p className="text-[11px] text-zinc-500 truncate">
@@ -134,8 +129,8 @@ export function AdminSidebar() {
               onClick={() => logout()}
               disabled={isPending}
               aria-label="Log out"
-              className="p-1.5 rounded-md text-zinc-500
-                         hover:bg-zinc-800 hover:text-red-400
+              className="p-1.5 rounded-md text-muted-foreground
+                         hover:bg-accent hover:text-foreground
                          transition-colors disabled:opacity-50 shrink-0"
             >
               <LogOut size={14} />
