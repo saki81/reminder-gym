@@ -95,17 +95,19 @@ export function AdminSidebar() {
       </SidebarContent>
  
   
-      <SidebarFooter className="border-t p-3">
+      <SidebarFooter className="z-20">
         {/* Back to app */}
-        <Link
+        <SidebarMenuButton className="cursor-pointer">
+         <Link
           to="/gym"
-          className="flex items-center gap-2 text-sm text-muted-foreground
-                     hover:text-accent-foreground transition-colors px-1"
+          className="flex items-center text-md text-muted-foreground
+                     hover:text-accent-foreground transition-colors p-2"
         >
           <ArrowLeft size={13} />
           Back to app
-        </Link>
- 
+          
+         </Link>
+        </SidebarMenuButton>
         {/* User info + logout */}
         {user && (
           <div className="flex items-center justify-between gap-2">
@@ -119,7 +121,7 @@ export function AdminSidebar() {
                 <p className="text-xs font-medium truncate">
                   {user.name ?? "Admin"}
                 </p>
-                <p className="text-[11px] text-zinc-500 truncate">
+                <p className="text-[11px] truncate">
                   {user.email}
                 </p>
               </div>

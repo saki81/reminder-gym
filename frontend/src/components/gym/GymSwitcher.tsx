@@ -24,10 +24,10 @@ import type { Gym }     from "@/types";
 
 export function GymSwitcher() {
   const navigate = useNavigate();
-  const { gyms, isLoading }              = useMyGyms();
+  const { gyms, isLoading } = useMyGyms();
   const { mutate: switchGym, isPending } = useSwitchGym();
-  const { currentGym }                   = useGym();
-  const { hasRole }                      = useAuth();
+  const { currentGym } = useGym();
+  const { hasRole } = useAuth();
 
   if (isLoading || !currentGym) {
     return <Skeleton className="h-9 w-44" />;

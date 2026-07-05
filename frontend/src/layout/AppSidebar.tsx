@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink,Link } from "react-router-dom";
 import {
   LayoutDashboard,
   Dumbbell,
@@ -7,6 +7,9 @@ import {
   Settings,
   Building2,
   LogOut,
+  ArrowDownRight,
+  ArrowBigRight,
+  ArrowRightIcon,
 } from "lucide-react";
 
 import {
@@ -115,7 +118,20 @@ export function AppSidebar() {
       </SidebarContent>
 
    
-      <SidebarFooter className="border-t p-3">
+      <SidebarFooter className="border-t p-3 z-10">
+        {/* Go to Admin panel*/}
+        <SidebarMenuButton className="cursor-pointer">
+        {hasRole(["ADMIN"]) && (
+          <Link 
+            to="/admin" 
+            className="flex items-center text-md text-muted-foreground
+                       hover:text-accent-foreground cursor-pointer transition-colors p-2"
+          >
+            Go to Admin Panel
+            <ArrowRightIcon size={13}/> 
+          </Link>        
+        )}
+         </SidebarMenuButton>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
             <Avatar className="size-8 shrink-0">
