@@ -58,8 +58,15 @@ export const equipmentSchema = z.object({
 
     model: z.string().trim().max(100).optional(),
 
-    categoryId: z.string().uuid("Invalid category id"),    
+    categoryId: z.string().uuid("Invalid category id"), 
+    
+    inventoryNumber: z.string().trim().max(50).optional().or(z.literal("")),
+
+    serialNumber: z.string().trim().max(100).optional().or(z.literal("")),
+
+     serviceIntervalDays: z.number().int().min(1).max(3650).optional(),
 });
+
 
 export const updateEquipmentSchema = equipmentSchema.partial()
 

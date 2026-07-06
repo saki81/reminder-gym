@@ -7,8 +7,6 @@ import {
   Settings,
   Building2,
   LogOut,
-  ArrowDownRight,
-  ArrowBigRight,
   ArrowRightIcon,
 } from "lucide-react";
 
