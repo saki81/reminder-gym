@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
+import { getGymAccess } from "../utils/gymAccess.js";
 
 
 export const createEquipment = async (req:Request, res: Response) => {
@@ -11,41 +12,18 @@ export const createEquipment = async (req:Request, res: Response) => {
             return res.status(401).json({ message: "Unauthorized" });
         }
 
-        // Active gym
-        const user = await prisma.user.findUnique({
-            where: {
-                id: userId
-            },
-            select: {
-                activeGymId: true
-            }
+
+        const gymAccess = await getGymAccess(userId, {
+             minimumRole: "STAFF",
         });
 
-        if (!user?.activeGymId) {
-            return res.status(400).json({ message: "No active gym selected"})
-        }
+        if (!gymAccess) {
+           return res.status(403).json({
+             message: "Access denied",
+         });
+      }
 
-        const gymId = user.activeGymId;
-
-        // OWNER STAFF OR GLOBAL ADMIN
-        const access = await prisma.admin.findFirst({
-            where: {
-                userId,
-                OR: [
-                    {
-                       gymId
-                    },
-                    {
-                       role: "ADMIN",
-                       gymId: null
-                    }
-                ]
-            }
-        });
-
-        if (!access) {
-            return res.status(403).json({ message: "You dont have permission"})
-        }
+        const { gymId } = gymAccess;
 
         const {
             name,
@@ -119,43 +97,18 @@ export const getEquipments = async (req:Request, res:Response) => {
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized"})
         }
-
-        const user = await prisma.user.findUnique({
-
-            where: {
-                id: userId
-            },
-
-            select: {
-                activeGymId: true
-            }
+         
+        const gymAccess = await getGymAccess(userId, {
+          minimumRole: "STAFF",
         });
 
-        if (!user?.activeGymId) {
-            return res.status(400).json({ message: "No active gym selected" })
-        }
+        if (!gymAccess) {
+          return res.status(403).json({
+           message: "Access denied",
+       });
+     }
 
-        const gymId = user.activeGymId;
-
-        const access = await prisma.admin.findFirst({
-
-            where: {
-                userId,
-                OR: [
-                    {
-                        gymId
-                    },
-                    {
-                        role: "ADMIN",
-                        gymId: null
-                    }
-                ]
-            }
-        });
-
-        if (!access) {
-            return res.status(403).json({ message: "Access denied"})
-        }
+        const { gymId } = gymAccess;
 
         const equipments = await prisma.equipment.findMany({
 
