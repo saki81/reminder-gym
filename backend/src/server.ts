@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.route.js";
 import gymRoutes from "./routes/gym.route.js";
 import equipmentRoutes from "./routes/equipment.route.js";
+import categoryRoutes from "./routes/category.route.js";
 
 dotenv.config();
 
@@ -30,7 +31,8 @@ app.use((req, res, next) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/gym", gymRoutes);
-app.use("/api/equipment", equipmentRoutes)
+app.use("/api/equipment", equipmentRoutes);
+app.use("/api/category", categoryRoutes);
 
 
 const PORT = process.env.PORT || 5000;

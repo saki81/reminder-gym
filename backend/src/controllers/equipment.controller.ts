@@ -316,7 +316,7 @@ export const updateEquipment = async (req:Request, res:Response) => {
             }
         });
 
-        return res.status(200).json({ message: "Equipment updated successfully"})
+        return res.status(200).json({ message: "Equipment updated successfully", equipment})
 
       } catch (error: any) {
         

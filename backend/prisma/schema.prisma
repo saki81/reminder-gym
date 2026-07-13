@@ -144,16 +144,18 @@ model Equipment {
 
 model Category {
   id        String    @id @default(uuid())
-  name      String    @unique
+  name      String  
+ 
 
   createdAt DateTime  @default(now())
 
-  gymId     String?
-  gym       Gym? @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  gymId     String
+  gym       Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
 
   equipments Equipment[]
 
-  @@index([name, gymId])
+  @@unique([gymId, name])
+  @@index([ gymId])
  
 }
 
