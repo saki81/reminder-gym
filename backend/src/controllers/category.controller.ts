@@ -55,11 +55,46 @@ export const createCategory = async ( req: Request, res: Response) => {
 
 export const getCategories = async (req: Request, res: Response) => {
   try {
+    const userId = req.user?.userId;
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Internal server error",
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const gymAccess = await getGymAccess(userId, {
+      minimumRole: "STAFF",
+    });
+
+    if (!gymAccess) {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+    const { gymId } = gymAccess;
+
+    const categories = await prisma.category.findMany({
+      where: {
+        gymId,
+      },
+      orderBy: [
+        {
+          isDefault: "desc",
+        },
+        {
+          name: "asc",
+        },
+      ],
+    });
+
+    return res.status(200).json({
+      categories,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      message: error.message,
     });
   }
 };

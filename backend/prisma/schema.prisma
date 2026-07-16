@@ -145,7 +145,7 @@ model Equipment {
 model Category {
   id        String    @id @default(uuid())
   name      String  
- 
+  isDefault Boolean  @default(false)
 
   createdAt DateTime  @default(now())
 

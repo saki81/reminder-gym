@@ -89,10 +89,13 @@ async function main() {
            name
          },
         },
-      update: {},
+      update: {
+        isDefault: true,
+      },
       create: {
         name,
         gymId: gym.id,
+        isDefault: true,
       },
     });
   }
