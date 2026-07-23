@@ -90,12 +90,11 @@ export const maintenanceStatusEnum = z.enum([
     "COMPLETED",
     "SCHEDULED"
 ]);
-
 export const maintenanceSchema = z.object({
      title: z.string().trim().min(2, "Title must be at least 2 characters")
         .max(120, "Title too long" ),
     
-        description: z.string().trim().max(500).optional(),
+        description: z.string().trim().max(500).optional().or(z.literal("")),
     
         cost: z.number().positive("Cost must be positive").optional(),
     
@@ -103,7 +102,7 @@ export const maintenanceSchema = z.object({
     
         performedAt: z.coerce.date(),
     
-        nextDueDate: z.coerce.date().optional(),
+        nextDueDate: z.coerce.date().optional().nullable(),
     
         equipmentId: z.string().uuid("Invalid equipmentId")
 });

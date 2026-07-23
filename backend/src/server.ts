@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.route.js";
 import gymRoutes from "./routes/gym.route.js";
 import equipmentRoutes from "./routes/equipment.route.js";
 import categoryRoutes from "./routes/category.route.js";
+import maintenanceRoutes from "./routes/maintenance.route.js";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/gym", gymRoutes);
 app.use("/api/equipment", equipmentRoutes);
 app.use("/api/category", categoryRoutes);
+app.use("/api/maintenances", maintenanceRoutes)
 
 
 const PORT = process.env.PORT || 5000;

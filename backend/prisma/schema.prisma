@@ -186,6 +186,7 @@ model Maintenance {
 
    @@index([equipmentId])
    @@index([userId])
+   @@index([gymId])
 }
 
 enum MaintenanceStatus {
