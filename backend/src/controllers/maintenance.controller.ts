@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
+import { buildMaintenanceFilters } from "../utils/maintenanceFilters.js";
 import { prisma } from "../lib/prisma.js";
 import { getGymAccess } from "../utils/gymAccess.js";
+
 
 export const createMaintenance = async (req: Request, res: Response) => {
   try {
@@ -95,16 +97,30 @@ export const getMaintenances = async (req: Request, res: Response) => {
 
     const { gymId } = gymAccess;
 
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 12;
+    const page = Math.max(Number(req.query.page) || 1, 1);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 12, 1), 50);
 
     const skip = (page - 1) * limit;
 
+    const search = req.query.search?.toString().trim();
+    const status = req.query.status?.toString();
+    const equipmentId = req.query.equipmentId?.toString();
+    const categoryId = req.query.categoryId?.toString();
+
+  
+    const where = buildMaintenanceFilters({
+       gymId,
+       search,
+       status,
+       equipmentId,
+       categoryId,
+     });
+
     const [maintenances, total] = await Promise.all([
       prisma.maintenance.findMany({
-        where: {
-          gymId,
-        },
+
+        where,
+
         include: {
           equipment: {
             select: {
@@ -128,14 +144,13 @@ export const getMaintenances = async (req: Request, res: Response) => {
       }),
 
       prisma.maintenance.count({
-        where: {
-          gymId,
-        },
+        where,     
       }),
     ]);
 
     return res.status(200).json({
        maintenances,
+
        pagination: {
          total,
          page,
