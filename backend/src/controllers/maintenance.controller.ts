@@ -271,7 +271,49 @@ export const deleteMaintenance = async (
   res: Response
 ) => {
   try {
+    const userId = req.user?.userId;
 
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const gymAccess = await getGymAccess(userId, {
+      minimumRole: "STAFF",
+    });
+
+    if (!gymAccess) {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+    const { gymId } = gymAccess;
+    const { maintenanceId } = req.params;
+
+    const maintenance = await prisma.maintenance.findFirst({
+      where: {
+        id: maintenanceId,
+        gymId,
+      },
+    });
+
+    if (!maintenance) {
+      return res.status(404).json({
+        message: "Maintenance not found",
+      });
+    }
+
+    await prisma.maintenance.delete({
+      where: {
+        id: maintenanceId,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Maintenance deleted successfully",
+    });
   } catch (error: any) {
     return res.status(500).json({
       message: error.message,
