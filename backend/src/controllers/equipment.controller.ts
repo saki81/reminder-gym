@@ -77,9 +77,14 @@ export const createEquipment = async (req:Request, res: Response) => {
                 userId
             },
             
-            include: {
-                category: true
-            }
+           include: {
+             category: {
+               select: {
+                 id: true,
+                 name: true,
+              },
+            },
+          },
         });
 
         return res.status(201).json({ message: "Equipment created successfully", equipment})

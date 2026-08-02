@@ -54,7 +54,7 @@ model Admin {
   userId    String    
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  role      AdminRole @default(STAFF)
+  role      AdminRole @default(OWNER)
   gymId     String?   // null za platform ADMIN
   gym       Gym?      @relation(fields: [gymId], references: [id])
 

@@ -43,8 +43,6 @@ export  const resetPasswordSchema = z.object({
 export const categorySchema = z.object({
     name: z.string().trim().min(2, "Category name must be least 2 characters")
     .max(50, "Category name too long"),
-
-    gymId: z.string().uuid("Invalid gym id")
 });
 
 export const updateCategorySchema = categorySchema.partial();
@@ -64,7 +62,7 @@ export const equipmentSchema = z.object({
 
     serialNumber: z.string().trim().max(100).optional().or(z.literal("")),
 
-     serviceIntervalDays: z.number().int().min(1).max(3650).optional(),
+    serviceIntervalDays: z.number().int().min(1).max(3650).optional(),
 });
 
 

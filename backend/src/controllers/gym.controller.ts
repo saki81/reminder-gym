@@ -21,15 +21,32 @@ export const createGym = async (req:Request, res:Response) => {
                     userId,
                     role: "OWNER",
                     isOwner: true
-              }
-            }
-         }
-       });
+              },
+            },
+         },
+        });
+        // Create default categories for the new gym
+        const defaultCategories = [
+         "Cardio Machines",
+         "Strength Machines",
+         "Benches",
+         "Free Weights",
+         "Functional",
+     ];
 
-       // set active gym
-       await prisma.user.update({
-          where: { id: userId },
-          data: { activeGymId: gym.id }
+      await prisma.category.createMany({
+      data: defaultCategories.map((name) => ({
+        name,
+        gymId: gym.id,
+        isDefault: true,
+      })),
+    
+    });
+
+     // set active gym
+     await prisma.user.update({
+        where: { id: userId },
+        data: { activeGymId: gym.id }
        });
 
        return res.status(201).json({
@@ -40,7 +57,7 @@ export const createGym = async (req:Request, res:Response) => {
          return res.status(500).json({
            message: "Server error"
     });
-    }
+  }
 };
 
 
