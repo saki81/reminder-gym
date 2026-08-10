@@ -1,6 +1,6 @@
 import express from "express";
-//import { verifyToken } from "../middlewares/verifyToken";
-//import { isPlatformAdmin } from "../middlewares/isPlatformAdmin";
+import { verifyToken } from "../middlewares/verifyToken.js";
+import { isPlatformAdmin } from "../middlewares/isPlatformAdmin.js";
 
 import {
     getDashboard,
@@ -24,8 +24,8 @@ import {
 
 const router = express.Router();
 
-//router.use(verifyToken);
-//router.use(isPlatformAdmin);
+router.use(verifyToken);
+router.use(isPlatformAdmin);
 
 router.get("/dashboard", getDashboard);
 

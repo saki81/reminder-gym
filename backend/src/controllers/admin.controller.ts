@@ -1,8 +1,16 @@
 import { Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
+import { buildAdminUserFilters } from "../utils/admin.user.filters.js"
 
 export const getDashboard = async (req: Request, res: Response) => {};
 
-export const getUsers = async (req: Request, res: Response) => {};
+export const getUsers = async (req: Request, res: Response) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+};
 
 export const getUserById = async (req: Request, res: Response) => {};
 
