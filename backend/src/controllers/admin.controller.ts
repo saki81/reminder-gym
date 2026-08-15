@@ -291,9 +291,121 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-export const activateUser = async (req: Request, res: Response) => {};
+export const activateUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
 
-export const deactivateUser = async (req: Request, res: Response) => {};
+    if (!id) {
+      return res.status(400).json({message: "User id is required"})
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        isActive: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({message: "User not found"});
+    }
+
+    if (user.isActive) {
+      return res.status(400).json({message: "User is already active"});
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: true,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        isActive: true,
+        emailVerified: true,
+      },
+    });
+
+    return res.status(200).json({
+      message: "User activated successfully",
+      user: updatedUser,
+    });
+
+
+
+  } catch (error) {
+       console.error("activateUser error:", error);
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const deactivateUser = async (req: Request,res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        message: "User ID is required",
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        isActive: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found",});
+    }
+
+    if (!user.isActive) {
+      return res.status(400).json({ message: "User is already inactive", });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: false,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        isActive: true,
+        emailVerified: true,
+      },
+    });
+
+    return res.status(200).json({
+      message: "User deactivated successfully",
+      user: updatedUser,
+    });
+
+  } catch (error) {
+    console.error("deactivateUser error:", error);
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
 
 export const deleteUser = async (req: Request, res: Response) => {};
 
