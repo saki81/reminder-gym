@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { buildAdminUserFilters } from "../utils/admin.user.filters.js";
+import { buildAdminGymFilters } from "../utils/admin.gym.filters.js";
 import { prisma } from "../lib/prisma.js";
 
 
@@ -407,9 +408,128 @@ export const deactivateUser = async (req: Request,res: Response) => {
   }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {};
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
 
-export const getGyms = async (req: Request, res: Response) => {};
+    if (!id) {
+      return res.status(400).json({message: "User ID is required",})
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        isActive: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({message: "User not found"});
+    }
+
+     await prisma.user.delete({
+      where: {
+        id,
+      },
+    });
+
+    return res.status(200).json({
+      message: "User deleted successfully",
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+    });
+  } catch (error) {
+      console.error("deleteUser error:", error);
+
+      return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getGyms = async (req: Request, res: Response) => {
+  try {
+       const page = Math.max(Number(req.query.page) || 1,1);
+
+       const limit = Math.min(Math.max(Number(req.query.limit) || 12, 1), 50);
+
+       const skip = (page - 1) * limit;
+
+
+       const search = req.query.search?.toString().trim();
+       const city = req.query.city?.toString().trim();
+       const status = req.query.status?.toString();
+
+       const where = buildAdminGymFilters({
+        search,
+        city,
+        status,
+       });
+
+       const [gyms, total] = await Promise.all([
+      
+      prisma.gym.findMany({
+        where,
+
+        skip,
+        take: limit,
+
+        orderBy: {
+          createdAt: "desc",
+        },
+
+        select: {
+          id: true,
+          gymName: true,
+          city: true,
+          isActive: true,
+          createdAt: true,
+
+          _count: {
+            select: {
+              admins: true,
+              equipments: true,
+              categories: true,
+              maintenances: true,
+            },
+          },
+        },
+      }),
+
+       prisma.gym.count({
+        where,
+      }),
+    ]);
+
+     const totalPages = Math.ceil(total / limit);
+
+      return res.status(200).json({
+        gyms,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      });
+
+
+  } catch (error) {
+      console.error("getGyms error:", error);
+
+      return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
 
 export const getGymById = async (req: Request, res: Response) => {};
 
