@@ -531,9 +531,134 @@ export const getGyms = async (req: Request, res: Response) => {
   }
 };
 
-export const getGymById = async (req: Request, res: Response) => {};
+export const getGymById = async (req: Request, res: Response) => {
+  try {
+     const { id } = req.params;
 
-export const createGym = async (req: Request, res: Response) => {};
+    if (!id) {
+      return res.status(400).json({
+        message: "Gym ID is required",
+      });
+    }
+
+    const gym = await prisma.gym.findUnique({
+      where: {
+        id,
+      },
+
+      select: {
+        id: true,
+        gymName: true,
+        city: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+
+        _count: {
+          select: {
+            admins: true,
+            equipments: true,
+            categories: true,
+            maintenances: true,
+          },
+        },
+      },
+    });
+
+     if (!gym) {
+      return res.status(404).json({
+        message: "Gym not found",
+      });
+    }
+
+    return res.status(200).json({
+      gym,
+    });
+  } catch (error) {
+    console.error("getGymById error:", error);
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const createGym = async (req: Request, res: Response) => {
+  try {
+        const { gymName, city, ownerId } = req.body;
+
+        const owner = await prisma.user.findUnique({
+          where: {
+           id: ownerId,
+          },
+         select: {
+         id: true,
+         isActive: true,
+        },
+      });
+
+     if (!owner) {
+      return res.status(404).json({
+        message: "Owner user not found",
+      });
+    }
+
+    if (!owner.isActive) {
+      return res.status(400).json({
+        message: "Owner user is inactive",
+      });
+    }
+
+     const gym = await prisma.$transaction(async (tx) => {
+
+      const newGym = await tx.gym.create({
+        data: {
+          gymName,
+          city,
+
+          admins: {
+            create: {
+              userId: ownerId,
+              role: "OWNER",
+              isOwner: true,
+            },
+          },
+        },
+      });
+
+       const defaultCategories = [
+        "Cardio Machines",
+        "Strength Machines",
+        "Benches",
+        "Free Weights",
+        "Functional",
+      ];
+
+      await tx.category.createMany({
+        data: defaultCategories.map((name) => ({
+          name,
+          gymId: newGym.id,
+          isDefault: true,
+        })),
+      });
+
+
+      return newGym;
+    });
+      
+      return res.status(201).json({
+      message: "Gym created successfully",
+      gym,
+    });
+
+  } catch (error) {
+      console.error("createGym error:", error);
+
+      return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
 
 export const updateGym = async (req: Request, res: Response) => {};
 
