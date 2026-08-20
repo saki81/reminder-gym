@@ -11,9 +11,6 @@ export const registerSchema = z.object({
     name: z.string().trim().min(3,"Name must be ast least 3 characters" ).
     max(50, "Name to long"),
 
-   // gymName: z.string().trim().min(2, "Gym name must be at least 2 characters").
-   // max(50, "Gym name to long"),
-
     city: z.string().trim().optional()
 
 });
@@ -21,6 +18,33 @@ export const registerSchema = z.object({
 export const loginSchema = z.object({
      email: z.string().trim().toLowerCase().email("Invalid email format"),
      password: z.string().min(1, "Password is required"),
+});
+
+// UPDATE USER STATUS FROM ADMIN
+export const updateUserSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(3, "Name must be at least 3 characters")
+    .max(100, "Name is too long")
+    .optional(),
+
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email("Invalid email format")
+    .optional(),
+
+  emailVerified: z
+    .boolean()
+    .optional(),
+});
+
+// UPDATE USER PROFILE
+export const updateOwnerProfileSchema = updateUserSchema.pick({
+  name: true,
+  email: true,
 });
 
 export const verifyOtpSchema = z.object({

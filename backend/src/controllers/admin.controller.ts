@@ -163,9 +163,11 @@ export const updateUser = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     if (!id) {
-      return res.status(400).json({message: "User ID is requred"});
+      return res.status(400).json({
+        message: "User ID is required",
+      });
     }
-    
+
     const { name, email, emailVerified } = req.body;
 
     const existingUser = await prisma.user.findUnique({
@@ -180,7 +182,9 @@ export const updateUser = async (req: Request, res: Response) => {
     });
 
     if (!existingUser) {
-      return res.status(404).json({message: "User not found"});
+      return res.status(404).json({
+        message: "User not found",
+      });
     }
 
     const data: {
@@ -190,57 +194,58 @@ export const updateUser = async (req: Request, res: Response) => {
       emailVerifiedAt?: Date | null;
     } = {};
 
+
     if (name !== undefined) {
-      data.name = name?.trim() || null;
+      data.name = name.trim() || null;
     }
+
 
     if (email !== undefined) {
       const normalizedEmail = email.trim().toLowerCase();
 
-      if (!normalizedEmail) {
-       return res.status(400).json({message: "Email cannot be empty"})
-     }
-
       if (normalizedEmail !== existingUser.email) {
-       const emailExists = await prisma.user.findUnique({
-         where: {
-           email: normalizedEmail,
-         },
-         
-         select: {
-           id: true,
-         },
-       });
+        const emailExists = await prisma.user.findUnique({
+          where: {
+            email: normalizedEmail,
+          },
 
-       if (emailExists) {
-         return res.status(409).json({ message: "Email is already is use"})
-       }
+          select: {
+            id: true,
+          },
+        });
 
-       data.email = normalizedEmail;
+        if (emailExists) {
+          return res.status(409).json({
+            message: "Email is already in use",
+          });
+        }
 
-       // New email must be verified
-       data.emailVerified = false;
-       data.emailVerifiedAt = null;
-     }
-   }
+        data.email = normalizedEmail;
+
+        // New email requires verification
+        data.emailVerified = false;
+        data.emailVerifiedAt = null;
+        }
+    }
+
+
+    if (emailVerified !== undefined) {
+      data.emailVerified = emailVerified;
+
+      data.emailVerifiedAt = emailVerified
+        ? new Date()
+        : null;
+    }
+
     
-   if (emailVerified !== undefined) {
-     if (typeof emailVerified !== "boolean") {
-       return res.status(400).json({ message: "emailVerified must be boolean"});
-     }
 
-     data.emailVerified = emailVerified;
-
-     data.emailVerifiedAt = emailVerified ? new Date() : null;
-   }
-
-     if (Object.keys(data).length === 0) {
+    if (Object.keys(data).length === 0) {
       return res.status(400).json({
         message: "No data to update",
       });
     }
 
-     const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: {
         id,
       },
@@ -281,16 +286,14 @@ export const updateUser = async (req: Request, res: Response) => {
       user: updatedUser,
     });
 
-
-    
   } catch (error) {
-       console.error("updateUser error:", error);
+    console.error("updateUser error:", error);
 
     return res.status(500).json({
       message: "Internal server error",
     });
   }
-};
+ };
 
 export const activateUser = async (req: Request, res: Response) => {
   try {
@@ -493,6 +496,22 @@ export const getGyms = async (req: Request, res: Response) => {
           isActive: true,
           createdAt: true,
 
+          admins: {
+            where: {
+              role: "OWNER",
+              isOwner: true,
+            },
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          },
+
           _count: {
             select: {
               admins: true,
@@ -553,6 +572,25 @@ export const getGymById = async (req: Request, res: Response) => {
         isActive: true,
         createdAt: true,
         updatedAt: true,
+
+        admins: {
+          where: {
+            role: "OWNER",
+            isOwner: true,
+          },
+
+          select: {
+            userId: true,
+
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
 
         _count: {
           select: {

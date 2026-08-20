@@ -1,7 +1,8 @@
 import express from "express";
 import { verifyToken } from "../middlewares/verifyToken.js";
 import { isPlatformAdmin } from "../middlewares/isPlatformAdmin.js";
-
+import { gymSchema, updateUserSchema } from "../validators/schema.validator.js";
+import { validate } from "../middlewares/validate.middleware.js";
 import {
     getDashboard,
 
@@ -34,7 +35,7 @@ router.get("/dashboard", getDashboard);
 router.get("/users", getUsers);
 router.get("/users/:id", getUserById);
 
-router.patch("/users/:id", updateUser);
+router.patch("/users/:id", validate(updateUserSchema), updateUser);
 
 router.patch("/users/:id/activate", activateUser);
 router.patch("/users/:id/deactivate", deactivateUser);
@@ -46,9 +47,9 @@ router.delete("/users/:id", deleteUser);
 router.get("/gyms", getGyms);
 router.get("/gyms/:id", getGymById);
 
-router.post("/gyms", createGym);
+router.post("/gyms",validate(gymSchema), createGym);
 
-router.patch("/gyms/:id", updateGym);
+router.patch("/gyms/:id",validate(gymSchema), updateGym);
 
 router.patch("/gyms/:id/activate", activateGym);
 router.patch("/gyms/:id/deactivate", deactivateGym);
