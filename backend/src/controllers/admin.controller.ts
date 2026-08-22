@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
 import { buildAdminUserFilters } from "../utils/admin.user.filters.js";
 import { buildAdminGymFilters } from "../utils/admin.gym.filters.js";
 import { prisma } from "../lib/prisma.js";
+import { createAndSendVerificationOtp } from "../services/emailVerification.service.js";
 
 
 export const getDashboard = async (req: Request, res: Response) => {};
@@ -194,14 +194,20 @@ export const updateUser = async (req: Request, res: Response) => {
       emailVerifiedAt?: Date | null;
     } = {};
 
+    let emailChanged = false;
 
     if (name !== undefined) {
       data.name = name.trim() || null;
     }
 
-
     if (email !== undefined) {
       const normalizedEmail = email.trim().toLowerCase();
+
+       if (!normalizedEmail) {
+        return res.status(400).json({
+          message: "Email cannot be empty",
+        });
+      }
 
       if (normalizedEmail !== existingUser.email) {
         const emailExists = await prisma.user.findUnique({
@@ -220,6 +226,8 @@ export const updateUser = async (req: Request, res: Response) => {
           });
         }
 
+        emailChanged = true;
+
         data.email = normalizedEmail;
 
         // New email requires verification
@@ -229,7 +237,7 @@ export const updateUser = async (req: Request, res: Response) => {
     }
 
 
-    if (emailVerified !== undefined) {
+    if (emailVerified !== undefined && !emailChanged) {
       data.emailVerified = emailVerified;
 
       data.emailVerifiedAt = emailVerified
@@ -281,13 +289,26 @@ export const updateUser = async (req: Request, res: Response) => {
       },
     });
 
+    // Send verification OTP
+    if (emailChanged) {
+      try {
+          await createAndSendVerificationOtp(updatedUser.id);
+        } catch (error) { 
+          console.error("Failed to send verification OTP")      
+      }
+    }
+
     return res.status(200).json({
-      message: "User updated successfully",
-      user: updatedUser,
+       message: emailChanged 
+         ? "User updated successfully. Verification OTP sent."
+         : "User updated successfully",
+
+         verificationRequired: emailChanged,
+         user: updatedUser,
     });
 
   } catch (error) {
-    console.error("updateUser error:", error);
+      console.error("updateUser error:", error);
 
     return res.status(500).json({
       message: "Internal server error",

@@ -52,10 +52,7 @@ export const createAndSendVerificationOtp = async (userId: string) => {
     to: user.email,
     subject: "Verify your email",
 
-    text: `
-       Your verification code is: ${otp}
-
-       This code expires in 10 minutes.
-    `,
+    text: ` Your verification code is: ${otp}
+            This code expires in 10 minutes.`,
   });
 };

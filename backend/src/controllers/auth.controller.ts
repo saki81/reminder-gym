@@ -3,6 +3,7 @@ import bcrypt from "bcrypt"
 import { prisma } from "../lib/prisma.js";
 import { signToken } from "../utils/jwtToken.js";
 import { hashToken } from "../utils/hashToken.js";
+import { createAndSendVerificationOtp } from "../services/emailVerification.service.js";
 import  transporter  from "../config/nodemailer.js"
 
 
@@ -42,21 +43,18 @@ export const register = async (req:Request, res:Response) => {
         maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    // delete old otp tokens
-    await prisma.emailVerificationToken.deleteMany({
+   
+  /*  await prisma.emailVerificationToken.deleteMany({
         where: { userId: user.id }
     });
-    
-    // generate 6-digit number
+  
     const otp = Math.floor( 100000 + Math.random() * 900000).toString();
 
-    // hash otp
     const hashedOtp = hashToken(otp);
 
-    // expires in 10 minutes
     const expiresAt = new Date(Date.now() + 1000 * 60 * 10);
     
-    // save OTP
+  
     await prisma.emailVerificationToken.create({
         data: {
             token: hashedOtp,
@@ -65,13 +63,14 @@ export const register = async (req:Request, res:Response) => {
         }
     });
 
-     // send verification email
+    
     await transporter.sendMail({
       from: process.env.SENDER_EMAIL,
       to: user.email,
       subject: "Verify your email",
       text: `Your verification code is: ${otp}`
-    });
+    });*/
+   await createAndSendVerificationOtp(user.id);
 
    return  res.json({ message: "User created" });
    
@@ -160,7 +159,7 @@ export const sendVerifyOtp = async (req:Request, res:Response) => {
         });
 
         // generate OTP
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+       /* const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
         const hashedToken = hashToken(otp);
 
@@ -179,12 +178,15 @@ export const sendVerifyOtp = async (req:Request, res:Response) => {
             to: user.email,
             subject: "Email verification",
             text: `Your verification code is: ${otp}`
-        });
+        });*/
+
+        await createAndSendVerificationOtp(user.id);
 
         return res.json({ message: "Verification OTP sent"})
         
     } catch (error) {
-       return res.status(500).json(error)
+       console.error("send verify otp error", error);
+       return res.status(500).json({message: "Server error"})
     }  
 }
 
@@ -235,7 +237,7 @@ export const verifyEmail = async (req:Request, res:Response) => {
 };
 
 export const verifyResetOtp = async (req: Request, res: Response) => {
-  const { otp } = req.body;
+    const { otp } = req.body;
 
   try {
     const hashedOtp = hashToken(otp);
