@@ -43,33 +43,6 @@ export const register = async (req:Request, res:Response) => {
         maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-   
-  /*  await prisma.emailVerificationToken.deleteMany({
-        where: { userId: user.id }
-    });
-  
-    const otp = Math.floor( 100000 + Math.random() * 900000).toString();
-
-    const hashedOtp = hashToken(otp);
-
-    const expiresAt = new Date(Date.now() + 1000 * 60 * 10);
-    
-  
-    await prisma.emailVerificationToken.create({
-        data: {
-            token: hashedOtp,
-            userId: user.id,
-            expiresAt
-        }
-    });
-
-    
-    await transporter.sendMail({
-      from: process.env.SENDER_EMAIL,
-      to: user.email,
-      subject: "Verify your email",
-      text: `Your verification code is: ${otp}`
-    });*/
    await createAndSendVerificationOtp(user.id);
 
    return  res.json({ message: "User created" });
@@ -157,28 +130,6 @@ export const sendVerifyOtp = async (req:Request, res:Response) => {
         await prisma.emailVerificationToken.deleteMany({
             where: { userId: user.id }
         });
-
-        // generate OTP
-       /* const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-        const hashedToken = hashToken(otp);
-
-        const expiresAt = new Date(Date.now() + 1000 * 60 * 10);
-
-        await prisma.emailVerificationToken.create({
-            data: {
-                token: hashedToken,
-                userId: user.id,
-                expiresAt
-            }
-        });
-
-        await transporter.sendMail({
-            from: process.env.SENDER_EMAIL,
-            to: user.email,
-            subject: "Email verification",
-            text: `Your verification code is: ${otp}`
-        });*/
 
         await createAndSendVerificationOtp(user.id);
 
@@ -419,7 +370,7 @@ export const getMe = async (req: Request, res: Response) => {
     return res.json({
       user: {
         ...safeUser,
-        role: activeAdmin?.role ?? "STAFF", 
+        role: activeAdmin?.role ?? "OWNER", 
       },
     });
 
