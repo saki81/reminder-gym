@@ -1,7 +1,7 @@
 import express from "express";
 import { verifyToken } from "../middlewares/verifyToken.js";
 import { isPlatformAdmin } from "../middlewares/isPlatformAdmin.js";
-import { gymSchema, updateUserSchema } from "../validators/schema.validator.js";
+import { gymSchema, updateUserSchema, updateGymSchema } from "../validators/schema.validator.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import {
     getDashboard,
@@ -49,7 +49,7 @@ router.get("/gyms/:id", getGymById);
 
 router.post("/gyms",validate(gymSchema), createGym);
 
-router.patch("/gyms/:id",validate(gymSchema), updateGym);
+router.patch("/gyms/:id",validate(updateGymSchema), updateGym);
 
 router.patch("/gyms/:id/activate", activateGym);
 router.patch("/gyms/:id/deactivate", deactivateGym);

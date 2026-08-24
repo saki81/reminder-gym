@@ -719,9 +719,148 @@ export const createGym = async (req: Request, res: Response) => {
   }
 };
 
-export const updateGym = async (req: Request, res: Response) => {};
+export const updateGym = async (req: Request, res: Response) => {
+  try {
+     const { id } = req.params;
 
-export const activateGym = async (req: Request, res: Response) => {};
+     if (!id) {
+      return res.status(400).json({ message: "Gym ID is reqired"});
+     }
+
+     const { gymName, city } = req.body;
+
+     const existingGym = await prisma.gym.findUnique({
+      where: {
+        id,
+      },
+
+      select: {
+        id: true,
+      },
+     });
+
+     if (!existingGym) {
+      return res.status(404).json({ message: "Gym nnot found" });
+     }
+
+     const data: { gymName?: string; city?: string } = {};
+
+     if (city !== undefined) {
+      data.gymName = gymName.trim();
+     }
+
+     if (city !== undefined) {
+      data.city = city.trim();
+     }
+
+     if (Object.keys(data).length === 0) {
+      return res.status(400).json({ message: "No data to update" });
+     }
+
+     const updateGym = await prisma.gym.update({
+        where: {
+          id,
+        },
+
+        data,
+
+        select: {
+           id: true,
+           gymName: true,
+           city: true,
+           isActive: true,
+           createdAt: true,
+
+           _count: {
+             select: {
+               admins: true,
+               equipments: true,
+               categories: true,
+               maintenance: true,
+             },
+           },
+        },
+     });
+
+     return res.status(200).json({
+         message: "Gym updated successfully",
+         gym: updateGym,
+     })
+
+  } catch (error) {
+       console.error("updateGym error:", error);
+
+       return res.status(500).json({
+       message: "Internal server error",
+    });
+  
+  }
+};
+
+export const activateGym = async (req: Request, res: Response) => {
+    try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        message: "Gym ID is required",
+      });
+    }
+
+    const existingGym = await prisma.gym.findUnique({
+      where: {
+        id,
+      },
+
+      select: {
+        id: true,
+        isActive: true,
+      },
+    });
+
+    if (!existingGym) {
+      return res.status(404).json({
+        message: "Gym not found",
+      });
+    }
+
+    if (existingGym.isActive) {
+      return res.status(400).json({
+        message: "Gym is already active",
+      });
+    }
+
+    const gym = await prisma.gym.update({
+      where: {
+        id,
+      },
+
+      data: {
+        isActive: true,
+      },
+
+      select: {
+        id: true,
+        gymName: true,
+        city: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Gym activated successfully",
+      gym,
+    });
+  } catch (error) {
+    console.error("activateGym error:", error);
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  } 
+};
 
 export const deactivateGym = async (req: Request, res:Response) => {};
 
