@@ -862,6 +862,102 @@ export const activateGym = async (req: Request, res: Response) => {
   } 
 };
 
-export const deactivateGym = async (req: Request, res:Response) => {};
+export const deactivateGym = async (req: Request, res:Response) => {
+   try {
+      const { id } = req.params;
 
-export const deleteGym = async (req: Request, res: Response) => {};
+      if (!id) {
+        return res.status(400).json({message: "Gym ID is required"});
+      }
+
+      const existingGym = await prisma.gym.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          id: true,
+          isActive: true,
+        },
+      });
+
+      if (!existingGym) {
+        return res.status(404).json({message: "Gym not found"});
+      }
+
+      if (!existingGym.isActive) {
+        return res.status(400).json({message: "Gym is already inactive"});
+      }
+
+      const gym = await prisma.gym.update({
+        where: {
+          id,
+        },
+        data: {
+          isActive: false,
+        },
+        select: {
+          id: true,
+          gymName: true,
+          city: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      return res.status(200).json({
+         message: "Gym deactivated successfully",
+         gym,
+      })
+
+
+   } catch (error) {
+       console.error("deactivateGym error:", error);
+
+      return res.status(500).json({
+       message: "Internal server error",
+    });
+   }
+};
+
+export const deleteGym = async (req: Request, res: Response) => {
+   try {
+      const { id } = req.params;
+
+      if (!id) {
+         return res.status(400).json({message: "Gym ID is required"});
+      }
+
+      const existingGym = await prisma.gym.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          id: true,
+          gymName: true,
+        },
+      });
+
+      if (!existingGym) {
+        return res.status(404).json({message: "Gym not found"});
+      }
+
+      await prisma.gym.delete({
+        where: {
+          id,
+        },
+      });
+
+      return res.status(200).json({
+          message: "Gym deleted successfully",
+          gymId: existingGym.id,
+      })
+    
+   } catch (error) {
+      console.error("deleteGym error:", error);
+
+      return res.status(500).json({
+      message: "Internal server error",
+    });
+   }
+};
