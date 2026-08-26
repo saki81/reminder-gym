@@ -14,14 +14,29 @@ export const getGymAccess = async ( userId: string, options: GymAccessOptions = 
     },
     select: {
       activeGymId: true,
+      isActive: true,
     },
   });
 
-  if (!user?.activeGymId) {
+  if (!user?.isActive || !user?.activeGymId) {
     return null;
   }
 
   const gymId = user.activeGymId;
+
+  const gym = await prisma.gym.findUnique({
+      where: {
+       id: gymId,
+      },
+      select: {
+       id: true,
+       isActive: true,
+    },
+  });
+
+    if (!gym || !gym.isActive) {
+     return null;
+   }
 
   const gymCondition: Prisma.AdminWhereInput = options.minimumRole === "OWNER"
           ? {

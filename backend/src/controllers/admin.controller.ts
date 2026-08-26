@@ -5,7 +5,69 @@ import { prisma } from "../lib/prisma.js";
 import { createAndSendVerificationOtp } from "../services/emailVerification.service.js";
 
 
-export const getDashboard = async (req: Request, res: Response) => {};
+export const getDashboard = async (req: Request, res: Response) => {
+    try {
+       const [
+         totalUsers,
+         activeUsers,
+         inactiveUsers,
+         totalGyms,
+         activeGyms,
+         inactiveGyms,
+       ] = await Promise.all([
+
+         prisma.user.count(),
+
+         prisma.user.count({
+           where: {
+             isActive: true,
+           },
+         }),
+
+         prisma.user.count({
+           where: {
+             isActive: false,
+           }, 
+         }),
+
+         prisma.gym.count(),
+
+         prisma.gym.count({
+           where: {
+             isActive: true,
+           },
+         }),
+
+         prisma.gym.count({
+           where: {
+             isActive: false,
+           },
+         }),
+       ]);
+
+       return res.status(200).json({
+          dashboard: {
+            users: {
+               total: totalUsers,
+               active: activeUsers,
+               inactive: inactiveUsers,
+            },
+
+            gyms: {
+               total: totalGyms,
+               active: activeGyms,
+               inactive: inactiveGyms,
+            },
+          },
+       });
+    } catch (error) {
+        console.error("getAdminDashboard error:", error);
+
+        return res.status(500).json({
+        message: "Internal server error",
+    });
+    }
+};
 
 export const getUsers = async (req: Request, res: Response) => {
     try {
