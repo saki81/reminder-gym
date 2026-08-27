@@ -1,5 +1,76 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
+import { getGymAccess } from "../utils/gymAccess.js";
+
+
+export const getGymDashboard = async (req: Request, res: Response) => {
+    try {
+       const userId = req.user?.userId;
+
+       if (!userId) {
+         return res.status(401).json({message: "Unauthorized"});
+       }
+
+       const access = await getGymAccess(userId);
+
+       if (!access) {
+         return res.status(403).json({message: "You do not have access to this gym"});
+       }
+
+       const { gymId } = access;
+
+       const [
+          totalEquipments,
+          totalMaintenances,
+          maintenaceCost,
+       ] = await Promise.all([
+
+          prisma.equipment.count({
+            where: {
+              gymId,
+            },
+          }),
+          
+          prisma.maintenance.count({
+            where: {
+              equipment: {
+                gymId,
+              },
+            },
+          }),
+
+          prisma.maintenance.aggregate({
+            where: {
+              equipment: {
+                gymId,
+              },
+            },
+            _sum: {
+              cost: true,
+            },
+          }),
+        ]);
+
+        return res.status(200).json({
+           dashboard: {
+              equipment: {
+                total: totalEquipments,
+              },
+
+              maintenace: {
+                total: totalMaintenances,
+                totalCost: maintenaceCost._sum.cost ?? 0,
+              },
+           },
+        });
+    } catch (error) {
+         console.error("getGymDashboard error:", error);
+
+         return res.status(500).json({
+         message: "Internal server error",
+      });
+    }
+}
 
 
 export const createGym = async (req:Request, res:Response) => {

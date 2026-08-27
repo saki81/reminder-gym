@@ -2,10 +2,11 @@ import express from "express";
 import { verifyToken } from "../middlewares/verifyToken.js";
 import { gymSchema } from "../validators/schema.validator.js";
 import { validate } from "../middlewares/validate.middleware.js";
-import { createGym,getMyGyms,switchGym,updateGym,deleteGym} from "../controllers/gym.controller.js";
+import { getGymDashboard,createGym,getMyGyms,switchGym,updateGym,deleteGym} from "../controllers/gym.controller.js";
 
 const router = express.Router();
 
+router.get("/dashboard", verifyToken, getGymDashboard)
 router.post("/", verifyToken, validate(gymSchema), createGym);
 router.get("/my-gyms", verifyToken, getMyGyms);
 router.patch("/switch", verifyToken,switchGym);
