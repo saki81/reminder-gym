@@ -57,12 +57,15 @@ export const GymForm = ({
                aria-invalid={!!errors.city}
                {...register("city")}
             />
+               {errors.city && (
+              <p className="textt-xs text-destructive">{errors.city.message}</p>
+           )}
         </div>
 
         <Button
            type="submit"
            className="w-full"
-           disabled={isPending || (!!defaultValues && !isDirty)}
+           disabled={ isPending || (!!defaultValues && !isDirty)}
          >
            {isPending ? (
              <span className="flex items-center gap-2">
@@ -71,7 +74,7 @@ export const GymForm = ({
                  Saving…
              </span>
            ) : (
-            submitLabel
+              submitLabel
            )}
         </Button>
 

@@ -15,14 +15,15 @@ export function useUpdateGym() {
         mutationFn: (data:UpdateGym) => gymApi.updateGym(currentGym!.id, data),
 
         onSuccess: (res) => {
-            const updatedGym = res.data.gym;
+             const updatedGym = res.data.gym;
 
             // Update gym context to new data 
             setCurrentGym(updatedGym);
-
+             
             queryClient.invalidateQueries({ queryKey: ["my-gyms"] });
 
-            toast.success("Gym updated successfully")
+            toast.success("Gym updated successfully");
         } 
+        
     });
 }

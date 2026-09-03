@@ -23,7 +23,7 @@ export function useCreateGym() {
  
       // Lokal update user sa activeGymId
       if (user) {
-        login({ ...user, gymId: gym.id });
+        login({ ...user, activeGymId: gym.id });
       }
  
       //put activ gym in GymContext

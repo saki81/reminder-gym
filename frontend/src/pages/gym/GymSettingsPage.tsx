@@ -47,6 +47,7 @@ if (!currentGym) {
         }
       },
     });
+    
   };
  
   const handleDelete = () => {

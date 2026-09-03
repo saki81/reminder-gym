@@ -127,18 +127,66 @@ export type CreateMaintenance = {
 };
  
 export type UpdateMaintenance = Partial<CreateMaintenance>;
+
  
 // Admin 
- 
-export type AdminStats = {
-  totalGyms: number;
-  totalUsers: number;
-  totalEquipments: number;
-  totalMaintenances: number;
-};
- 
-export type AdminUser = User & {
-  gym?: Gym;
+
+export interface AdminUserGymInfo {
+  id: string;
+  gymName: string;
+  city: string;
+}
+
+export type AdminUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  isActive: boolean;
+  emailVerified: boolean;
+  activeGymId: string | null;
   createdAt: string;
-};
- 
+  updatedAt: string;
+  gyms: AdminUserGymInfo[];
+}
+
+export type PaginationMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export type GetUsersParams = {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: "active" | "inactive" | string;
+  gymId?: string;
+}
+
+export type GetUsersResponse = {
+  users: AdminUser[];
+  pagination: PaginationMeta;
+}
+
+export type UpdateUserPayload = {
+  name?: string;
+  email?: string;
+  emailVerified?: boolean;
+}
+
+export type AdminDashboard = {
+  users: {
+    total: number;
+    active: number;
+    inactive: number;
+  };
+  gyms: {
+    total: number;
+    active: number;
+    inactive: number;
+  };
+}
+
