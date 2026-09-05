@@ -18,7 +18,7 @@ import type { UseFormSetError } from "react-hook-form";
 
 export const GymSettingsPage = () => {
   const { currentGym } = useGym();
-  const { mutate: updateGym, isPending: isUpdating } = useUpdateGym();
+  const { mutate: updateGym, isPending } = useUpdateGym();
   const { mutate: deleteGym, isPending: isDeleting } = useDeleteGym();
   const toast = useToast();
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -80,7 +80,7 @@ if (!currentGym) {
           <GymForm
             defaultValues={{ gymName: currentGym.gymName, city: currentGym.city }}
             onSubmit={handleSubmit}
-            isPending={isUpdating}
+            isPending={isPending}
             submitLabel="Save changes"
           />
         </CardContent>

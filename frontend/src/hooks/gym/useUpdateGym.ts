@@ -12,10 +12,10 @@ export function useUpdateGym() {
 
     return useMutation({
 
-        mutationFn: (data:UpdateGym) => gymApi.updateGym(currentGym!.id, data),
+        mutationFn: (data:UpdateGym) =>  gymApi.updateGym(currentGym!.id, data),
 
         onSuccess: (res) => {
-             const updatedGym = res.data.gym;
+             const updatedGym = res.data?.gym;
 
             // Update gym context to new data 
             setCurrentGym(updatedGym);
