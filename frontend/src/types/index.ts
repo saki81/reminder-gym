@@ -147,6 +147,7 @@ export type AdminUser = {
   createdAt: string;
   updatedAt: string;
   gyms: AdminUserGymInfo[];
+  
 }
 
 export type PaginationMeta = {
@@ -170,6 +171,30 @@ export type GetUsersResponse = {
   users: AdminUser[];
   pagination: PaginationMeta;
 }
+
+export type AdminUserAdminEntryRaw = {
+  id: string;
+  gymId: string;
+  gym?: AdminUserGymInfo;
+}
+ 
+export type AdminUserRaw = {
+  id: string;
+  email: string;
+  name: string | null;
+  isActive: boolean;
+  emailVerified: boolean;
+  activeGymId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  admins: AdminUserAdminEntryRaw[];
+}
+ 
+export type GetUsersResponseRaw = {
+  users: AdminUserRaw[];
+  pagination: PaginationMeta;
+}
+
 
 export type UpdateUserPayload = {
   name?: string;

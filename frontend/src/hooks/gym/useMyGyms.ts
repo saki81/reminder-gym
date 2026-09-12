@@ -10,7 +10,7 @@ export function useMyGyms() {
     const { isAuthenticated, user } = useAuth();
     const { currentGym, setCurrentGym } = useGym();
 
-     const gymId = user?.gymId ?? null;
+     const gymId = user?.activeGymId ?? null;
 
     const query = useQuery({
         queryKey: ["my-gyms"],

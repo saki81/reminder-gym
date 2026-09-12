@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction} from "express";
 import { verifyJwt } from "../utils/jwtToken.js";
+import { prisma } from "../lib/prisma.js";
 
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
      
     const token = req.cookies?.accessToken;
 
@@ -14,11 +15,25 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 
 try {
 
-    const decoded = verifyJwt(token);
+    const decoded = verifyJwt(token) as { userId: string };
     console.log("DECODED JWT:", decoded);
 
-    req.user = decoded as { userId: string };
 
+    const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: { id: true, isActive: true},
+    });
+
+    if (!user) {
+        return res.status(401).json({ message: "Invalid or expired token" })
+    }
+
+    if (!user.isActive) {
+        res.clearCookie("accessToken", { path: "/" });
+        return res.status(403).json({ message: "Account is deactivated" });
+    }
+ 
+    req.user =  { userId: decoded.userId };
     next()
    } catch (error) {
 
