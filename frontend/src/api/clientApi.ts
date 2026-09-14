@@ -25,7 +25,7 @@ apiClient.interceptors.response.use((res) => res, (err) => {
     );
 
     // only real session expiry
-    if (status === 401 && !isIgnored) {
+    if ((status === 401 || status === 403)  && !isIgnored) {
       console.warn("Session expired → redirect login");
       window.location.href = "/login";
     }
