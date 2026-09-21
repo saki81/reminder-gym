@@ -111,6 +111,7 @@ export function AppRouter() {
                <Route path="/admin" element={<AdminLayout><AdminPage /></AdminLayout>} />
                <Route path="/admin/gyms" element={<AdminLayout><AdminGymsPage /></AdminLayout>} />
                <Route path="/admin/users" element={<AdminLayout><AdminUsersPage /></AdminLayout>} />
+               <Route path="/admin/users/:userId" element={<AdminLayout><AdminUsersPage /></AdminLayout>}/>
             </Route>
        
 

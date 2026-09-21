@@ -40,7 +40,6 @@ export type ApiError = {
 };
 
 // Gym
-
 export type Gym = {
   id: string;
   gymName: string; 
@@ -129,8 +128,7 @@ export type CreateMaintenance = {
 export type UpdateMaintenance = Partial<CreateMaintenance>;
 
  
-// Admin 
-
+// Admin users
 export interface AdminUserGymInfo {
   id: string;
   gymName: string;
@@ -195,11 +193,170 @@ export type GetUsersResponseRaw = {
   pagination: PaginationMeta;
 }
 
+export type AdminUserDetail = AdminUser & {
+  emailVerifiedAt: string | null;
+}
 
-export type UpdateUserPayload = {
-  name?: string;
-  email?: string;
-  emailVerified?: boolean;
+export type AdminUserGymInfoDetail = AdminUserGymInfo & {
+  createdAt: string;
+}
+
+export type AdminUserAdminEntryDetailRaw = {
+  id: string;
+  gymId: string;
+  gym?: AdminUserGymInfoDetail;
+}
+
+export type AdminUserDetailRaw = {
+  id: string;
+  email: string;
+  name: string | null;
+  isActive: boolean;
+  emailVerified: boolean;
+  emailVerifiedAt: string | null;
+  activeGymId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  admins: AdminUserAdminEntryDetailRaw[];
+}
+
+// ADMIN gyms
+export type AdminGymOwnerInfo = {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export type AdminGymCounts = {
+  admins: number;
+  equipments: number;
+  categories: number;
+  maintenances: number;
+}
+
+export type AdminGym = {
+  id: string;
+  gymName: string;
+  city: string;
+  isActive: boolean;
+  createdAt: string;
+  owner: AdminGymOwnerInfo | null;
+  counts: AdminGymCounts;
+}
+
+export type AdminGymDetail = {
+  id: string;
+  gymName: string;
+  city: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  owner: (AdminGymOwnerInfo & { userId: string }) | null;
+  counts: AdminGymCounts;
+}
+
+export type AdminGymBasic = {
+  id: string;
+  gymName: string;
+  city: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type GetGymsParams = {
+  page?: number;
+  limit?: number;
+  search?: string;
+  city?: string;
+  status?: "active" | "inactive" | string;
+}
+
+export type GetGymsResponse = {
+  gyms: AdminGym[];
+  pagination: PaginationMeta;
+}
+
+export type CreateGymPayload = {
+  gymName: string;
+  city: string;
+  ownerId: string;
+}
+
+export type UpdateGymPayload = {
+  gymName: string;
+  city: string;
+}
+
+export type AdminGymAdminEntryRaw = {
+  user: AdminGymOwnerInfo;
+}
+
+export type AdminGymRaw = {
+  id: string;
+  gymName: string;
+  city: string;
+  isActive: boolean;
+  createdAt: string;
+  admins: AdminGymAdminEntryRaw[];
+  _count: AdminGymCounts;
+}
+
+export type GetGymsResponseRaw = {
+  gyms: AdminGymRaw[];
+  pagination: Omit<PaginationMeta, "hasNextPage" | "hasPreviousPage">;
+}
+
+export type AdminGymDetailAdminEntryRaw = {
+  userId: string;
+  user: AdminGymOwnerInfo;
+}
+
+export type AdminGymDetailRaw = {
+  id: string;
+  gymName: string;
+  city: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  admins: AdminGymDetailAdminEntryRaw[];
+  _count: AdminGymCounts;
+}
+
+export type GetGymByIdResponseRaw = {
+  gym: AdminGymDetailRaw;
+}
+
+export type CreateGymResponse = {
+  message: string;
+  gym: AdminGymBasic;
+}
+
+export type UpdateGymResponseRaw = {
+  message: string;
+  gym: {
+    id: string;
+    gymName: string;
+    city: string;
+    isActive: boolean;
+    createdAt: string;
+    _count: {
+      admins: number;
+      equipments: number;
+      categories: number;
+      maintenance: number;
+    };
+  };
+}
+
+export type GymActionResponse = {
+  message: string;
+  gym: AdminGymBasic;
+}
+
+export type DeleteGymResponse = {
+  message: string;
+  gymId: string;
 }
 
 export type AdminDashboard = {
@@ -215,3 +372,4 @@ export type AdminDashboard = {
   };
 }
 
+  

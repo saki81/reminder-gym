@@ -23,6 +23,12 @@ export const buildAdminUserFilters =({
                 mode: "insensitive",
               },
             },
+            {
+              email: {
+                contains: search,
+                mode: "insensitive",
+              }
+            }
         ];
     }
 

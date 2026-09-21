@@ -5,6 +5,7 @@ import { prisma } from "../lib/prisma.js";
 import { createAndSendVerificationOtp } from "../services/emailVerification.service.js";
 
 
+// ADMIN dashboard statistic
 export const getDashboard = async (req: Request, res: Response) => {
     try {
        const [
@@ -68,7 +69,7 @@ export const getDashboard = async (req: Request, res: Response) => {
     });
     }
 };
-
+// ADMIN users
 export const getUsers = async (req: Request, res: Response) => {
     try {
        const page = Math.max(Number(req.query.page) || 1, 1);
@@ -220,163 +221,7 @@ export const getUserById = async (req: Request, res: Response) => {
     }
 };
 
-export const updateUser = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
 
-    if (!id) {
-      return res.status(400).json({
-        message: "User ID is required",
-      });
-    }
-
-    const { name, email, emailVerified } = req.body;
-
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        id,
-      },
-
-      select: {
-        id: true,
-        email: true,
-      },
-    });
-
-    if (!existingUser) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    const data: {
-      name?: string | null;
-      email?: string;
-      emailVerified?: boolean;
-      emailVerifiedAt?: Date | null;
-    } = {};
-
-    let emailChanged = false;
-
-    if (name !== undefined) {
-      data.name = name.trim() || null;
-    }
-
-    if (email !== undefined) {
-      const normalizedEmail = email.trim().toLowerCase();
-
-       if (!normalizedEmail) {
-        return res.status(400).json({
-          message: "Email cannot be empty",
-        });
-      }
-
-      if (normalizedEmail !== existingUser.email) {
-        const emailExists = await prisma.user.findUnique({
-          where: {
-            email: normalizedEmail,
-          },
-
-          select: {
-            id: true,
-          },
-        });
-
-        if (emailExists) {
-          return res.status(409).json({
-            message: "Email is already in use",
-          });
-        }
-
-        emailChanged = true;
-
-        data.email = normalizedEmail;
-
-        // New email requires verification
-        data.emailVerified = false;
-        data.emailVerifiedAt = null;
-        }
-    }
-
-
-    if (emailVerified !== undefined && !emailChanged) {
-      data.emailVerified = emailVerified;
-
-      data.emailVerifiedAt = emailVerified
-        ? new Date()
-        : null;
-    }
-
-    
-
-    if (Object.keys(data).length === 0) {
-      return res.status(400).json({
-        message: "No data to update",
-      });
-    }
-
-    const updatedUser = await prisma.user.update({
-      where: {
-        id,
-      },
-
-      data,
-
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        isActive: true,
-        emailVerified: true,
-        emailVerifiedAt: true,
-        activeGymId: true,
-        createdAt: true,
-        updatedAt: true,
-
-        admins: {
-          select: {
-            id: true,
-            role: true,
-            gymId: true,
-
-            gym: {
-              select: {
-                id: true,
-                gymName: true,
-                city: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Send verification OTP
-    if (emailChanged) {
-      try {
-          await createAndSendVerificationOtp(updatedUser.id);
-        } catch (error) { 
-          console.error("Failed to send verification OTP")      
-      }
-    }
-
-    return res.status(200).json({
-       message: emailChanged 
-         ? "User updated successfully. Verification OTP sent."
-         : "User updated successfully",
-
-         verificationRequired: emailChanged,
-         user: updatedUser,
-    });
-
-  } catch (error) {
-      console.error("updateUser error:", error);
-
-    return res.status(500).json({
-      message: "Internal server error",
-    });
-  }
- };
 
 export const activateUser = async (req: Request, res: Response) => {
   try {
@@ -540,7 +385,7 @@ export const deleteUser = async (req: Request, res: Response) => {
     });
   }
 };
-
+// ADMIN Gyms
 export const getGyms = async (req: Request, res: Response) => {
   try {
        const page = Math.max(Number(req.query.page) || 1,1);
@@ -807,7 +652,7 @@ export const updateGym = async (req: Request, res: Response) => {
 
      const data: { gymName?: string; city?: string } = {};
 
-     if (city !== undefined) {
+     if (gymName !== undefined) {
       data.gymName = gymName.trim();
      }
 

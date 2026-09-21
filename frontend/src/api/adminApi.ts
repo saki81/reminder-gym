@@ -3,7 +3,17 @@ import type {
     AdminUser,
     GetUsersParams,
     GetUsersResponseRaw, 
-    UpdateUserPayload 
+    GetGymsParams,
+    GetGymsResponseRaw,
+    AdminGymDetailRaw,
+    CreateGymPayload,
+    CreateGymResponse,
+    UpdateGymPayload,
+    UpdateGymResponseRaw,
+    GymActionResponse,
+    DeleteGymResponse,
+    AdminUserDetailRaw,
+
  } from "../types/index";
 
 export const adminApi = {
@@ -13,10 +23,8 @@ export const adminApi = {
         apiClient.get<GetUsersResponseRaw>("/admin/users", { params }),
 
     getUserById: (id: string) => 
-        apiClient.get<{ user: AdminUser }>(`/admin/users/${id}`),
+        apiClient.get<{ user: AdminUserDetailRaw }>(`/admin/users/${id}`),
 
-    updateUser: (id: string, data: UpdateUserPayload) => 
-        apiClient.patch<{ user: AdminUser }>(`/admin/users/${id}`, data),
 
     activateUser: (id: string) => 
         apiClient.patch<{ user: AdminUser }>(`/admin/users/${id}/activate`),
@@ -25,4 +33,25 @@ export const adminApi = {
         apiClient.patch<{ user: AdminUser }>(`/admin/users/${id}/deactivate`),
 
     deleteUser: (id: string) => apiClient.delete(`/admin/users/${id}`),
+
+    getGyms: (params: GetGymsParams) =>
+        apiClient.get<GetGymsResponseRaw>("/admin/gyms", { params }),
+
+    getGymById: (id: string) =>
+        apiClient.get<{ gym: AdminGymDetailRaw }>(`/admin/gyms/${id}`),
+
+    createGym: (data: CreateGymPayload) =>
+        apiClient.post<CreateGymResponse>("/admin/gyms", data),
+
+    updateGym: (id: string, data: UpdateGymPayload) =>
+        apiClient.patch<UpdateGymResponseRaw>(`/admin/gyms/${id}`, data),
+
+    activateGym: (id: string) =>
+        apiClient.patch<GymActionResponse>(`/admin/gyms/${id}/activate`),
+
+    deactivateGym: (id: string) =>
+        apiClient.patch<GymActionResponse>(`/admin/gyms/${id}/deactivate`),
+
+    deleteGym: (id: string) =>
+        apiClient.delete<DeleteGymResponse>(`/admin/gyms/${id}`),
 };

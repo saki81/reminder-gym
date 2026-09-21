@@ -1,14 +1,13 @@
 import express from "express";
 import { verifyToken } from "../middlewares/verifyToken.js";
 import { isPlatformAdmin } from "../middlewares/isPlatformAdmin.js";
-import { gymSchema, updateUserSchema, updateGymSchema } from "../validators/schema.validator.js";
+import { gymSchema, updateGymSchema } from "../validators/schema.validator.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import {
     getDashboard,
 
     getUsers,
     getUserById,
-    updateUser,
     activateUser,
     deactivateUser,
     deleteUser,
@@ -34,8 +33,6 @@ router.get("/dashboard", getDashboard);
 
 router.get("/users", getUsers);
 router.get("/users/:id", getUserById);
-
-router.patch("/users/:id", validate(updateUserSchema), updateUser);
 
 router.patch("/users/:id/activate", activateUser);
 router.patch("/users/:id/deactivate", deactivateUser);

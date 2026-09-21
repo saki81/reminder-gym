@@ -7,7 +7,7 @@ import { useAuth }   from "../shared/useAuth";
 // 8 sati:  8 * 60 * 60 * 1000  = 28800000
 // 12 sati: 12 * 60 * 60 * 1000 = 43200000
 
-const SESSION_CHECK_INTERVAL = 10 * 60 * 1000;
+const SESSION_CHECK_INTERVAL = 10 * 60 * 1000; // 10 minuta
 
 export function useMe() {
   const { login, logout, setLoading } = useAuth();

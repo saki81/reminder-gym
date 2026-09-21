@@ -32,8 +32,12 @@ import { useDeleteUser } from "@/hooks/admin/useDeleteUser";
 
 const PAGE_SIZE = 12;
 
+interface UserTableProps {
+  onViewDetails: (userId: string) => void;
+}
 
-export const UserTable = () => {
+
+export const UserTable = ({ onViewDetails }: UserTableProps) => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState<string>("all");
@@ -60,7 +64,6 @@ export const UserTable = () => {
     };
 
    
-  
     const handleStatusChange = (value: string | null) => {
       if (!value) return
       setStatus(value);
@@ -89,7 +92,7 @@ export const UserTable = () => {
         />
  
         <Select value={status} onValueChange={handleStatusChange}>
-          <SelectTrigger className="w-160">
+          <SelectTrigger className="w-70">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -132,13 +135,13 @@ export const UserTable = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Ime</TableHead>
+              <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Verifikovan</TableHead>
-              <TableHead>Teretane</TableHead>
-              <TableHead>Kreiran</TableHead>
-              <TableHead className="text-right">Akcije</TableHead>
+              <TableHead>Verified</TableHead>
+              <TableHead>Gyms</TableHead>
+              <TableHead>Create</TableHead>
+              <TableHead className="text-left w-5">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -148,12 +151,12 @@ export const UserTable = () => {
                 <TableCell className="text-muted-foreground">{user.email}</TableCell>
                 <TableCell>
                   <Badge variant={user.isActive ? "default" : "secondary"}>
-                    {user.isActive ? "Aktivan" : "Neaktivan"}
+                    {user.isActive ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant={user.emailVerified ? "outline" : "secondary"}>
-                    {user.emailVerified ? "Da" : "Ne"}
+                    {user.emailVerified ? "Yes" : "No"}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
@@ -166,6 +169,12 @@ export const UserTable = () => {
                 </TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onViewDetails(user.id)}>
+                      Details
+                    </Button>
                     {user.isActive ? (
                       <Button
                         variant="outline"
@@ -173,7 +182,7 @@ export const UserTable = () => {
                         disabled={isDeactivating}
                         onClick={() => deactivateUser(user.id)}
                       >
-                        Deaktiviraj
+                        Deactivate
                       </Button>
                     ) : (
                       <Button
@@ -194,7 +203,7 @@ export const UserTable = () => {
                       }
                       className="border-destructive/40 text-destructive hover:bg-destructive/10"
                     >
-                      Obriši
+                      Delete
                     </Button>
                   </div>
                 </TableCell>
@@ -208,8 +217,8 @@ export const UserTable = () => {
       {data && data.pagination.totalPages > 1 && (
         <div className="flex items-center justify-between border-t px-4 py-3 text-sm text-muted-foreground">
           <span>
-            Strana {data.pagination.page} od {data.pagination.totalPages}
-            {isFetching ? " · osvežavanje..." : ""}
+            Page {data.pagination.page} od {data.pagination.totalPages}
+            {isFetching ? " · refreshing..." : ""}
           </span>
           <div className="flex gap-2">
             <Button
@@ -218,7 +227,7 @@ export const UserTable = () => {
               disabled={!data.pagination.hasPreviousPage}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
             >
-              Prethodna
+              Previous
             </Button>
             <Button
               variant="outline"
@@ -226,22 +235,22 @@ export const UserTable = () => {
               disabled={!data.pagination.hasNextPage}
               onClick={() => setPage((p) => p + 1)}
             >
-              Sledeća
+              Next
             </Button>
           </div>
         </div>
       )}
  
-      {/* Shared confirm dialog (shadcn Dialog ispod haube) */}
+      {/* Shared confirm dialog */}
       <ConfirmDialog
         open={!!deleteTarget}
         onOpenChange={(open) => {
           if (!open) setDeleteTarget(null);
         }}
-        title="Obriši korisnika"
-        description={`Da li si siguran da želiš da obrišeš korisnika ${deleteTarget?.label ?? ""}? Ova akcija je nepovratna.`}
-        confirmLabel="Obriši"
-        cancelLabel="Otkaži"
+        title="Delete user"
+        description={`Are you sure you want to delete the user? ${deleteTarget?.label ?? ""}? This action is irreversible.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
         destructive
         loading={isDeleting}
         onConfirm={handleConfirmDelete}

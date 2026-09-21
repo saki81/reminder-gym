@@ -1,4 +1,4 @@
-import { email, z } from "zod";
+import {  z } from "zod";
 import { resetPassword } from "../controllers/auth.controller.js";
 
 // AUTH 
@@ -20,7 +20,7 @@ export const loginSchema = z.object({
      password: z.string().min(1, "Password is required"),
 });
 
-// UPDATE USER STATUS FROM ADMIN
+// UPDATE USER 
 export const updateUserSchema = z.object({
   name: z
     .string()
