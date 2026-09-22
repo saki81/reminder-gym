@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { adminApi } from "@/api/adminApi";
-import type {AdminUser, GetUsersParams } from "@/types/index";
+import type { AdminUser, GetUsersParams } from "@/types/index";
  
 export const useAllUsers = (params: GetUsersParams) => {
   return useQuery({

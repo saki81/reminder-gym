@@ -359,6 +359,7 @@ export type DeleteGymResponse = {
   gymId: string;
 }
 
+// ADMIN dashboard
 export type AdminDashboard = {
   users: {
     total: number;
