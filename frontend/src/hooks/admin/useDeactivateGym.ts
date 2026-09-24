@@ -1,13 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/api/adminApi";
 
-export const useDeleteGym = () => {
+export const useDeactivateGym = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => adminApi.deleteGym(id),
-    onSuccess: () => {
+    mutationFn: (id: string) => adminApi.deactivateGym(id),
+    onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: ["admin", "gyms"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "gym", id] });
     },
   });
 };
