@@ -686,7 +686,7 @@ export const updateGym = async (req: Request, res: Response) => {
                admins: true,
                equipments: true,
                categories: true,
-               maintenance: true,
+               maintenances: true,
              },
            },
         },

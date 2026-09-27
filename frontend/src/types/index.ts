@@ -334,7 +334,9 @@ export type CreateGymResponse = {
 
 export type UpdateGymResponseRaw = {
   message: string;
-  gym: {
+  gym: Omit<AdminGymRaw, "admins">
+  
+  /*{
     id: string;
     gymName: string;
     city: string;
@@ -346,7 +348,7 @@ export type UpdateGymResponseRaw = {
       categories: number;
       maintenance: number;
     };
-  };
+  };*/
 }
 
 export type GymActionResponse = {
