@@ -81,8 +81,8 @@ export const createGym = async (req:Request, res:Response) => {
        if (!userId) {
         return res.status(401).json({message: "Unauthorized"});
        }
-
-       const gym = await prisma.gym.create({
+      const gym = await prisma.$transaction(async (tx) => {
+       const newGym = await tx.gym.create({
          data: {
             gymName: req.body.gymName,
             city: req.body.city,
@@ -94,7 +94,7 @@ export const createGym = async (req:Request, res:Response) => {
                     isOwner: true
               },
             },
-         },
+          },
         });
         // Create default categories for the new gym
         const defaultCategories = [
@@ -108,17 +108,19 @@ export const createGym = async (req:Request, res:Response) => {
       await prisma.category.createMany({
       data: defaultCategories.map((name) => ({
         name,
-        gymId: gym.id,
+        gymId: newGym.id,
         isDefault: true,
       })),
-    
     });
 
      // set active gym
      await prisma.user.update({
         where: { id: userId },
-        data: { activeGymId: gym.id }
+        data: { activeGymId: newGym.id }
        });
+
+        return newGym
+      });
 
        return res.status(201).json({
         message: "Gym created successfully", gym

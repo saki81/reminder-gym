@@ -606,6 +606,11 @@ export const createGym = async (req: Request, res: Response) => {
         })),
       });
 
+      await tx.user.updateMany({
+         where: { id: ownerId, activeGymId: null },
+         data: { activeGymId: newGym.id },
+      })
+
 
       return newGym;
     });
