@@ -9,9 +9,9 @@ export const useCreateGym = () => {
     const toast = useToast();
 
     return useMutation({
-        mutationFn: (payload: CreateGymPayload) => adminApi.createGym(payload),
+        mutationFn: ( payload: CreateGymPayload) => adminApi.createGym(payload),
         onSuccess: () => {
-            queryClient.invalidateQueries;({ queeryKey: ["admin", "gyms"] });
+            queryClient.invalidateQueries;({ queryKey: ["admin", "gyms"] });
             toast.success("Gym craeted successfully")
         },
         onError: (error) => {

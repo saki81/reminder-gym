@@ -304,7 +304,8 @@ export type AdminGymRaw = {
 
 export type GetGymsResponseRaw = {
   gyms: AdminGymRaw[];
-  pagination: Omit<PaginationMeta, "hasNextPage" | "hasPreviousPage">;
+// pagination: Omit<PaginationMeta, "hasNextPage" | "hasPreviousPage">;
+  pagination: PaginationMeta;
 }
 
 export type AdminGymDetailAdminEntryRaw = {
@@ -333,6 +334,7 @@ export type CreateGymResponse = {
 }
 
 export type UpdateGymResponseRaw = {
+  id: string;
   message: string;
   gym: Omit<AdminGymRaw, "admins">
   

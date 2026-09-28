@@ -10,7 +10,7 @@ type Props = {
 export default function AdminLayout ({ children }: Props) {
   return (
     <SidebarProvider>
-      <Toaster position="top-right" richColors />
+    {/* <Toaster position="top-right" richColors /> */}
 
       <div className="flex h-svh w-full overflow-hidden ">
 

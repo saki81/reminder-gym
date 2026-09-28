@@ -3,20 +3,15 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogDescription,
-    DialogFooter
+    DialogDescription,  
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+
 
 interface FormDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     title: string;
     description?: string;
-    formId: string;
-    isSubmitting?: boolean;
-    submitLabel?: string;
-    cancelLabel?: string;
     children: React.ReactNode;
 }
 
@@ -26,10 +21,6 @@ export const FormDialog = ({
     onOpenChange,
     title,
     description,
-    formId,
-    isSubmitting = false,
-    submitLabel = "Save",
-    cancelLabel = "Cancel",
     children,
 }: FormDialogProps) => {
     return (
@@ -42,22 +33,6 @@ export const FormDialog = ({
 
             {children}
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
-               >
-                {cancelLabel}
-              </Button>
-              <Button
-                type="submit"
-                form={formId}
-                disabled={isSubmitting}>
-                  {isSubmitting ? "Saving..." : submitLabel}
-              </Button>
-            </DialogFooter>
           </DialogContent>
         </Dialog>
     );

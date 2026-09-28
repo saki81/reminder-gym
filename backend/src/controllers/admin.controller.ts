@@ -754,14 +754,13 @@ export const activateGym = async (req: Request, res: Response) => {
         gymName: true,
         city: true,
         isActive: true,
-        createdAt: true,
-        updatedAt: true,
+       
       },
     });
 
     return res.status(200).json({
       message: "Gym activated successfully",
-      gym,
+      gym: gym,
     });
   } catch (error) {
     console.error("activateGym error:", error);
@@ -810,14 +809,13 @@ export const deactivateGym = async (req: Request, res:Response) => {
           gymName: true,
           city: true,
           isActive: true,
-          createdAt: true,
-          updatedAt: true,
+       
         },
       });
 
       return res.status(200).json({
          message: "Gym deactivated successfully",
-         gym,
+         gym: gym,
       })
 
 
