@@ -144,8 +144,21 @@ export type AdminUser = {
   activeGymId: string | null;
   createdAt: string;
   updatedAt: string;
-  gyms: AdminUserGymInfo[];
-  
+  gyms: AdminUserGymInfo[]; 
+}
+
+export type AdminUserBasic = {
+  id: string;
+  name: string;
+  email: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type UserActionResponse = {
+  message: string;
+  user: AdminUser;
 }
 
 export type PaginationMeta = {
@@ -264,6 +277,11 @@ export type AdminGymBasic = {
   updatedAt: string;
 }
 
+export type GymActionResponse = {
+  message: string;
+  gym: AdminGymBasic;
+}
+
 export type GetGymsParams = {
   page?: number;
   limit?: number;
@@ -337,25 +355,6 @@ export type UpdateGymResponseRaw = {
   id: string;
   message: string;
   gym: Omit<AdminGymRaw, "admins">
-  
-  /*{
-    id: string;
-    gymName: string;
-    city: string;
-    isActive: boolean;
-    createdAt: string;
-    _count: {
-      admins: number;
-      equipments: number;
-      categories: number;
-      maintenance: number;
-    };
-  };*/
-}
-
-export type GymActionResponse = {
-  message: string;
-  gym: AdminGymBasic;
 }
 
 export type DeleteGymResponse = {

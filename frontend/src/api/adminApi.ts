@@ -9,6 +9,7 @@ import type {
     CreateGymPayload,
     CreateGymResponse,
     UpdateGymPayload,
+    UserActionResponse,
     UpdateGymResponseRaw,
     GymActionResponse,
     DeleteGymResponse,
@@ -30,7 +31,7 @@ export const adminApi = {
         apiClient.patch<{ user: AdminUser }>(`/admin/users/${id}/activate`),
 
     deactivateUser: (id: string) => 
-        apiClient.patch<{ user: AdminUser }>(`/admin/users/${id}/deactivate`),
+        apiClient.patch<UserActionResponse>(`/admin/users/${id}/deactivate`),
 
     deleteUser: (id: string) => apiClient.delete(`/admin/users/${id}`),
 

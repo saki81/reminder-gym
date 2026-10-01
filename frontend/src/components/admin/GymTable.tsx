@@ -43,6 +43,7 @@ export const GymTable = ({ onViewDetails }: GymTableProps) => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>("all");
+  const [pendingId, setPendingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{
     id: string;
     label: string;
@@ -57,9 +58,15 @@ export const GymTable = ({ onViewDetails }: GymTableProps) => {
   };
 
   const { data, isLoading, isFetching, isError } = useAllGyms(params);
-  const { mutate: activateGym, isPending: isActivating } = useActivateGym();
-  const { mutate: deactivateGym, isPending: isDeactivating } = useDeactivateGym();
+  const { mutate: activateGym } = useActivateGym();
+  const { mutate: deactivateGym } = useDeactivateGym();
   const { mutate: deleteGym, isPending: isDeleting } = useDeleteGym();
+
+  const toggleGym = (gym: AdminGym) => {
+    setPendingId(gym.id);
+    const mutate = gym.isActive ? deactivateGym : activateGym;
+    mutate(gym.id, { onSettled: () => setPendingId(null) })
+  }
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
@@ -176,7 +183,7 @@ export const GymTable = ({ onViewDetails }: GymTableProps) => {
                   {gym.counts.equipments}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {new Date(gym.createdAt).toLocaleDateString()}
+                  {new Date(gym.createdAt).toLocaleDateString("sr-Latn-BA")}
                 </TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-2">
@@ -199,8 +206,8 @@ export const GymTable = ({ onViewDetails }: GymTableProps) => {
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={isDeactivating}
-                        onClick={() => deactivateGym(gym.id)}
+                        disabled={pendingId === gym.id}
+                        onClick={() => toggleGym(gym)}
                       >
                         Deactivate
                       </Button>
@@ -208,8 +215,8 @@ export const GymTable = ({ onViewDetails }: GymTableProps) => {
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={isActivating}
-                        onClick={() => activateGym(gym.id)}
+                        disabled={pendingId === gym.id}
+                        onClick={() => toggleGym(gym)}
                         className="border-green-300 text-green-700 hover:bg-green-50"
                       >
                         Activate

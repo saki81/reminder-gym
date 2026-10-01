@@ -212,6 +212,7 @@ model Gym {
   activeUsers  User[] @relation("ActiveGymId")
 
   createdAt    DateTime    @default(now())
+  updatedAt    DateTime @updatedAt 
 }
 
 

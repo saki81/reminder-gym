@@ -23,7 +23,7 @@ import { ConfirmDialog } from "../shared/ConfirmDialog";
 import { EmptyState } from "../shared/EmptyState";
 import { Loader } from "../shared/Loader";
 
-import type { GetUsersParams } from "@/types";
+import type { AdminUser, GetUsersParams } from "@/types";
 import { useAllUsers } from "@/hooks/admin/useAllUsers";
 import { useActivateUser } from "@/hooks/admin/useActivateUser";
 import { useDeactivateUser } from "@/hooks/admin/useDeactivateUser";
@@ -41,6 +41,7 @@ export const UserTable = ({ onViewDetails }: UserTableProps) => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState<string>("all");
+    const [pendingId, setPendingId] = useState<string | null>(null)
     const [deleteTarget, setDeleteTarget] = useState<{
         id: string;
         label: string;
@@ -54,9 +55,15 @@ export const UserTable = ({ onViewDetails }: UserTableProps) => {
     };
 
     const { data, isLoading, isFetching, isError } = useAllUsers(params);
-    const { mutate: activateUser, isPending: isActivating } = useActivateUser();
-    const { mutate: deactivateUser, isPending: isDeactivating } = useDeactivateUser();
+    const { mutate: activateUser} = useActivateUser();
+    const { mutate: deactivateUser} = useDeactivateUser();
     const { mutate: deleteUser, isPending: isDeleting } = useDeleteUser();
+
+    const toggleUser = (user: AdminUser) => {
+        setPendingId(user.id);
+        const mutate = user.isActive ? deactivateUser : activateUser;
+         mutate(user.id, { onSettled: () => setPendingId(null) })
+    }
 
     const handleSearchChange = (value: string) => {
         setSearch(value);
@@ -179,8 +186,8 @@ export const UserTable = ({ onViewDetails }: UserTableProps) => {
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={isDeactivating}
-                        onClick={() => deactivateUser(user.id)}
+                        disabled={pendingId === user.id}
+                        onClick={() => toggleUser(user)}
                       >
                         Deactivate
                       </Button>
@@ -188,8 +195,8 @@ export const UserTable = ({ onViewDetails }: UserTableProps) => {
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={isActivating}
-                        onClick={() => activateUser(user.id)}
+                        disabled={pendingId === user.id}
+                        onClick={() => toggleUser(user)}
                         className="border-green-300 text-green-700 hover:bg-green-50"
                       >
                         Aktiviraj

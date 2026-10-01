@@ -105,7 +105,7 @@ export const createGym = async (req:Request, res:Response) => {
          "Functional",
      ];
 
-      await prisma.category.createMany({
+      await tx.category.createMany({
       data: defaultCategories.map((name) => ({
         name,
         gymId: newGym.id,
@@ -114,7 +114,7 @@ export const createGym = async (req:Request, res:Response) => {
     });
 
      // set active gym
-     await prisma.user.update({
+     await tx.user.update({
         where: { id: userId },
         data: { activeGymId: newGym.id }
        });

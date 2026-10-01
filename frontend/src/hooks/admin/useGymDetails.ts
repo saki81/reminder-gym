@@ -3,7 +3,7 @@ import { adminApi } from "@/api/adminApi";
 import type { AdminGymDetail } from "@/types";
 
 
-export const useGymById = (id?: string | null) => {
+export const useGymDetails = (id?: string | null) => {
     return useQuery({
         queryKey: ["admin", "gym", id],
         queryFn: async () => {
