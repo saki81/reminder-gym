@@ -186,6 +186,15 @@ export const switchGym = async (req:Request, res:Response) => {
          return res.status(403).json({ message: "No access to this gym"})
        }
 
+       const gym = await prisma.gym.findUnique({
+         where: { id: gymId },
+         select: { isActive: true }
+       });
+
+       if (!gym || !gym.isActive) {
+         return res.status(403).json({ message: "This gym is deactivated"})
+       }
+
        await prisma.user.update({
            where: { id: userId },
            data: { activeGymId: gymId }
@@ -231,6 +240,18 @@ export const  updateGym = async(req:Request, res:Response) => {
         if (!access) {
             return res.status(403).json({ message: "Not allowed "});
         };
+
+        // Platform admin smije dirati i deaktiviran gym; OWNER ne smije
+        if (access.gymId === gymId) {
+          const existingGym = await prisma.gym.findUnique({
+             where: { id: gymId },
+             select: { isActive: true}
+          });
+
+          if (!existingGym || !existingGym.isActive) {
+            return res.status(403).json({ message: "This gym is deactivated" });
+          }
+        }
 
         const gym = await prisma.gym.update({
             where: { id: gymId },
@@ -280,6 +301,17 @@ export const deleteGym = async (req:Request, res:Response) => {
       return res.status(403).json({
         message: "You cannot delete this gym"
       });
+    }
+
+     if (access.gymId === gymId) {
+      const existingGym = await prisma.gym.findUnique({
+        where: { id: gymId },
+        select: { isActive: true },
+      });
+
+      if (!existingGym || !existingGym.isActive) {
+        return res.status(403).json({ message: "This gym is deactivated" });
+      }
     }
 
     await prisma.gym.delete({

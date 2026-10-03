@@ -105,7 +105,7 @@ export const GymTable = ({ onViewDetails }: GymTableProps) => {
             placeholder="Search by gym name..."
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="max-w-xs"
+            className="max-w-xs "
           />
 
           <Select value={status} onValueChange={handleStatusChange}>
