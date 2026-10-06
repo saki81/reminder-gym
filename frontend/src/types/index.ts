@@ -44,6 +44,7 @@ export type Gym = {
   id: string;
   gymName: string; 
   city?: string;
+  isActive: boolean;
   craetedAt: string;
 };
 

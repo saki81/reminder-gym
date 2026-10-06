@@ -1,7 +1,3 @@
-// =============================================================================
-// components/gym/GymSwitcher.tsx
-// =============================================================================
-
 import { useNavigate } from "react-router-dom";
 import { Building2, Check, ChevronsUpDown, Plus, Settings } from "lucide-react";
 
@@ -60,19 +56,29 @@ export function GymSwitcher() {
         <DropdownMenuSeparator />
        
         {gyms.map((gym: Gym) => {
-          const isActive = gym.id === currentGym.id;
+          const isSelected = gym.id === currentGym.id;
+          const isInactive = !gym.isActive;
           return (
             <DropdownMenuItem
               key={gym.id}
-              disabled={isActive || isPending}
-              onClick={() => { if (!isActive) switchGym(gym.id); }}
+              disabled={isInactive || isPending || isSelected}
+              onClick={() => { if (!isInactive && !isSelected) switchGym(gym.id); }}
               className="flex items-center justify-between cursor-pointer"
             >
               <span className="flex items-center gap-2 min-w-0">
                 <Building2 size={13} className="shrink-0 text-muted-foreground" />
-                <span className="truncate text-sm">{gym.gymName}</span>
+                <span 
+                  className={[
+                    "truncate text-sm",
+                     isInactive ? "text-muted-foreground" : ""
+                    ].join(" ")}>
+                    {gym.gymName}
+                </span>
               </span>
-              {isActive && <Check size={13} className="text-primary shrink-0" />}
+              {isSelected && <Check size={13} className="text-primary shrink-0" />}
+              {isInactive && (
+                <span className="text-[10px] text-destructive srink-0">Inactive</span>
+              )}
             </DropdownMenuItem>
           );
         })}

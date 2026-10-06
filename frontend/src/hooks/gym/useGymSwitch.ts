@@ -19,13 +19,18 @@ export function useSwitchGym() {
 
             const gym = gyms.find((g:Gym) => g.id === gymId)
 
-            if (gym) setCurrentGym(gym);
+            if (gym) {
+                setCurrentGym(gym);
+                toast.success(`Switched to ${gym.gymName}`);
+            } else {
+                toast.success("Gym switched successfully");
+            }
 
             queryClient.invalidateQueries({ queryKey: ["equipment"] });
             queryClient.invalidateQueries({ queryKey: ["maintenance"] });
             queryClient.invalidateQueries({ queryKey: ["categories"] });
  
-            toast.success(`Switched to ${gym.gymName}`);
+          
 
         },
 

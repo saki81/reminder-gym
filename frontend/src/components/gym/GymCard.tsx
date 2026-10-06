@@ -1,4 +1,4 @@
-import { Building2, Check } from "lucide-react";
+import { Building2, Check, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
@@ -44,14 +44,20 @@ export const GymCard = ({
                 <p className="text-sm font-medium truncate">{gym.gymName}</p>
                 {isActive && (
                     <Badge variant="secondary" className="text-[-11px]">
-                       Active
+                       Current
                     </Badge>
                 )}
-              </div>
+                {!gym.isActive && (
+                    <Badge variant="destructive" className="text-[-11px]">
+                      <X size={11}/>
+                      Inactive
+                    </Badge>
+                )}
+               </div>
                 {gym.city && (
                     <p className="text-xs text-muted-foreground">{gym.city}</p>
                 )}
-            </div>
+              </div>
 
             {/* Actions */}
             <div className="flex items-center gap-2 shrink-0">
@@ -61,7 +67,7 @@ export const GymCard = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={isSwitching}
+                  disabled={isSwitching || !gym.isActive}
                   onClick={onSwitch}
                   className="text-xs h-8"
                 >
