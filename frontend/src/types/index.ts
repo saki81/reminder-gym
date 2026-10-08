@@ -377,4 +377,8 @@ export type AdminDashboard = {
   };
 }
 
+export type GetDashboardResponse = {
+  dashboard: AdminDashboard;
+}
+
   

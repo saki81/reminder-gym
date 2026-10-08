@@ -14,11 +14,12 @@ import type {
     GymActionResponse,
     DeleteGymResponse,
     AdminUserDetailRaw,
+    GetDashboardResponse,
 
  } from "../types/index";
 
 export const adminApi = {
-    getDashboard: () => apiClient.get("/admin/dashboard"),
+    getDashboard: () => apiClient.get<GetDashboardResponse>("/admin/dashboard"),
 
     getUsers: (params: GetUsersParams) => 
         apiClient.get<GetUsersResponseRaw>("/admin/users", { params }),
