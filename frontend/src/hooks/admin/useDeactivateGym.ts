@@ -10,9 +10,12 @@ export const useDeactivateGym = () => {
 
   return useMutation({
     mutationFn: (id: string) => adminApi.deactivateGym(id),
+    
     onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: ["admin", "gyms"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "gym", id] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+
       toast.success("Gym deactivated");
     },
     onError: (error) => {

@@ -13,6 +13,8 @@ export const useActivateUser = () => {
     onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       queryClient.invalidateQueries({ queryKey: ["admin-user", id] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+
       toast.success("User is activated")
     },
     onError: (error) => {

@@ -14,6 +14,8 @@ export const useDeactivateUser = () => {
     onSuccess: (_data, id) => {
        queryClient.invalidateQueries({ queryKey: ["admin-users"] });
        queryClient.invalidateQueries({ queryKey: ["admin-user", id] });
+       queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+       
        toast.success("User deactivated")
     },
     onError: (error) => {

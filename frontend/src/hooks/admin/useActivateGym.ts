@@ -10,10 +10,13 @@ export const useActivateGym = () => {
     
     return useMutation({
     mutationFn: (id: string) => adminApi.activateGym(id),
+    
     onSuccess: (_data, id) => {
         queryClient.invalidateQueries({ queryKey: ["admin", "gyms"]});
         queryClient.invalidateQueries({ queryKey: ["admin", "gym", id]});
-         toast.success("Gym activated");
+        queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+
+        toast.success("Gym activated");
     },
     onError: (error) => {
       toast.error(getErrorMessage(error, "Failed to activate gym"));
