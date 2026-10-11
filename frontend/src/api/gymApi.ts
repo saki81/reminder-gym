@@ -7,7 +7,7 @@ export const gymApi = {
     // get only OWNER OR ADMIN
     getMyGyms: () => apiClient.get("/gym/my-gyms"),
  
-    switchGym: (gymId: string) => apiClient.post("/gym/switch", { gymId }),
+    switchGym: (gymId: string) => apiClient.patch("/gym/switch", { gymId }),
  
     // update only OWNER OR ADMIN
     updateGym: (gymId: string, data: UpdateGym) => apiClient.patch(`/gym/${gymId}`, data),
