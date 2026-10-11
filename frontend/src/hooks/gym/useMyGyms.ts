@@ -16,11 +16,10 @@ export function useMyGyms() {
         queryKey: ["my-gyms"],
         queryFn: gymApi.getMyGyms,
         enabled: isAuthenticated,
-        staleTime: 1000 * 60 * 5,
+        staleTime: 1000 * 60 * 5,    
     });
-    
-    
-    const gyms = query.data?.data?.gyms ?? [];
+     
+    const gyms = query.data?.data?.gyms ?? []; 
 
     // Set up current gym authomatic
     useEffect(() => {

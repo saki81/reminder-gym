@@ -1,6 +1,7 @@
 import { useState }  from "react";
 import { Loader2 }   from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Button }    from "@/components/ui/button";
 import { GymForm }   from "@/components/gym/GymForm";
 import { useUpdateGym } from "@/hooks/gym/useUpdateGym";
@@ -30,6 +31,7 @@ if (!currentGym) {
       </div>
     );
   }
+
  
   const handleSubmit = (
     data: UpdateGym,
@@ -78,7 +80,8 @@ if (!currentGym) {
         </CardHeader>
         <CardContent>
           <GymForm
-            defaultValues={{ gymName: currentGym.gymName, city: currentGym.city }}
+            key={`${currentGym.id}-${currentGym.gymName}-${currentGym.city ?? ""}`}
+            defaultValues={{ gymName: currentGym.gymName, city: currentGym.city ?? "" }}
             onSubmit={handleSubmit}
             isPending={isPending}
             submitLabel="Save changes"
@@ -97,13 +100,36 @@ if (!currentGym) {
             records and categories. This action cannot be undone.
           </p>
  
-          {confirmDelete && (
+        {/*  {confirmDelete && (
             <p className="text-sm font-medium text-destructive">
               Are you sure? Click again to confirm deletion.
             </p>
-          )}
+            )} */}
+
+          <ConfirmDialog 
+            open={!!confirmDelete}
+            onOpenChange={(open) => {
+              if (!open) setConfirmDelete(false);
+            }}
+            title="Delete gym"
+            description=" Deleting this gym will permanently remove all equipment, maintenance
+            records and categories. This action cannot be undone."
+            confirmLabel="Delete"
+            cancelLabel="Cancel"
+            destructive
+            loading={isDeleting}
+            onConfirm={handleDelete}
+          />
+           <Button
+              variant="destructive"
+              size="sm"
+              disabled={isDeleting}
+              onClick={handleDelete}
+            >
+                Delete
+            </Button>
  
-          <div className="flex gap-2">
+       {/*   <div className="flex gap-2">
             <Button
               variant="destructive"
               size="sm"
@@ -132,11 +158,20 @@ if (!currentGym) {
                 Cancel
               </Button>
             )}
-          </div>
+              {confirmDelete && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setConfirmDelete(false)}
+              >
+                Cancel
+              </Button>
+            )}
+          </div> */}   
         </CardContent>
       </Card>
  
-    </div>
+    </div> 
   );
 
 }

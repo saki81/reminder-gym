@@ -29,7 +29,7 @@ export function useSwitchGym() {
             queryClient.invalidateQueries({ queryKey: ["equipment"] });
             queryClient.invalidateQueries({ queryKey: ["maintenance"] });
             queryClient.invalidateQueries({ queryKey: ["categories"] });
- 
+           
           
 
         },

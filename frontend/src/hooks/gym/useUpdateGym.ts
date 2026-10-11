@@ -18,7 +18,7 @@ export function useUpdateGym() {
              const updatedGym = res.data?.gym;
 
             // Update gym context to new data 
-            setCurrentGym(updatedGym);
+            setCurrentGym({ ...currentGym, ...updatedGym });
              
             queryClient.invalidateQueries({ queryKey: ["my-gyms"] });
 

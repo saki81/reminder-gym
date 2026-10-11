@@ -22,31 +22,29 @@ export function useDeleteGym() {
 
             const isActivateDeletion = currentGym?.id === deletedGymId;
 
-            if (isActivateDeletion) {
-                // fetch refresh list gyms
-                const result = await queryClient.fetchQuery({
-                    queryKey: ["my-gyms"],
-                    queryFn: gymApi.getMyGyms,
-                });
+            if (!isActivateDeletion) {
+              toast.success("Gym deleted successfully");
+              return;
+            }
 
-             const remainingGyms = result?.data?.gyms ?? [];
- 
-            if (remainingGyms.length > 0) {
-              // Automatic switch at first remaining gym
-              const nextGym = remainingGyms[0];
-              setCurrentGym(nextGym);
-            if (user) login({ ...user, gymId: nextGym.id });
-              toast.success("Gym deleted. Switched to another gym.");
-            } else {
-              
+            const result = await queryClient.fetchQuery({
+              queryKey: ["my-gyms"],
+              queryFn: gymApi.getMyGyms,
+            });
+
+            const [nextGym] = result?.data?.gyms ?? [];
+
+            if (!nextGym) {
               clearGym();
-              if (user) login({ ...user, gymId: undefined });
+              if (user) login({ ...user, activeGymId: null});
               toast.info("Gym deleted. Please create a new gym.");
               navigate("/gym/create", { replace: true });
+              return;
             }
-            } else {
-              toast.success("Gym deleted successfully.");
-          }
+
+            setCurrentGym(nextGym);
+            if (user) login({ ...user, activeGymId: nextGym.id });
+            toast.success("Gym deleted. Switched to another gym.")
         },
  
             onError: () => toast.error("Failed to delete gym."),
