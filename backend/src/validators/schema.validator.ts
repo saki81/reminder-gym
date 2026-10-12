@@ -105,6 +105,22 @@ export const gymSchema = z.object({
     .max(50, "City name too long"),
 });
 
+// ADMIN GYM
+export const adminCreateGymSchema = z.object({
+  gymName: z.string()
+    .trim()
+    .min(2, "Gym name must be at least 2 characters")
+    .max(50, "Gym name too long"),
+
+  city: z.string()
+    .trim()
+    .min(2, "City must be at least 2 characters")
+    .max(50, "City name too long")
+    .optional()
+    .transform((v) => v || undefined),
+    ownerId: z.string().min(1, "Owner is required")
+})
+
 export const updateGymSchema = gymSchema.partial();
 
 // MAINTENANCE

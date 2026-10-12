@@ -11,8 +11,8 @@ export const useCreateGym = () => {
     return useMutation({
         mutationFn: ( payload: CreateGymPayload) => adminApi.createGym(payload),
         onSuccess: () => {
-            queryClient.invalidateQueries;({ queryKey: ["admin", "gyms"] });
-            toast.success("Gym craeted successfully")
+            queryClient.invalidateQueries({ queryKey: ["admin", "gyms"] });
+            toast.success("Gym craeted successfully");
         },
         onError: (error) => {
             toast.error(getErrorMessage(error, "Failed to create gym"))
