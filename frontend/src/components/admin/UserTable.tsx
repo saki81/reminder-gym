@@ -257,9 +257,10 @@ export const UserTable = ({ onViewDetails }: UserTableProps) => {
         title="Delete user"
         description={`Are you sure you want to delete the user? ${deleteTarget?.label ?? ""}? This action is irreversible.`}
         confirmLabel="Delete"
+        pendingLabel="Deleting..."
         cancelLabel="Cancel"
-        destructive
-        loading={isDeleting}
+        variant="destructive"
+        isPending={isDeleting}
         onConfirm={handleConfirmDelete}
       />
     </Card>

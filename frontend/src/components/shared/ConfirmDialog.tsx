@@ -1,63 +1,67 @@
+import type { ReactNode } from "react"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
 interface ConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
   title: string;
-  description?: string;
+  description?: ReactNode;
   confirmLabel?: string;
+  pendingLabel?: string;
   cancelLabel?: string;
   destructive?: boolean;
-  loading?: boolean;
-  onConfirm: () => void;
+  variant?: "default" | "destructive";
+  isPending?: boolean;
 }
 
 export const ConfirmDialog = ({
   open,
   onOpenChange,
+  onConfirm,
   title,
   description,
-  confirmLabel = "Yes",
+  confirmLabel = "Confirm",
+  pendingLabel = "Please wait...",
   cancelLabel = "Cancel",
-  destructive = false,
-  loading = false,
-  onConfirm,
+  variant = "default",
+  isPending = false,
 }: ConfirmDialogProps) => {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-sm">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
-        </DialogHeader>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent className="sm:max-w-sm">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
+        </AlertDialogHeader>
 
-        <DialogFooter className="gap-2 sm:gap-2">
+        <AlertDialogFooter className="gap-2 sm:gap-2">
           <Button
             type="button"
             variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={loading}
+            disabled={isPending}
+            onClick={() => onOpenChange(false)}   
           >
             {cancelLabel}
           </Button>
           <Button
             type="button"
-            variant={destructive ? "destructive" : "default"}
+            variant={variant}
             onClick={onConfirm}
-            disabled={loading}
+            disabled={isPending}
           >
-            {loading ? "..." : confirmLabel}
+            {isPending ? pendingLabel : confirmLabel}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };

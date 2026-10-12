@@ -286,9 +286,10 @@ export const GymTable = ({ onViewDetails }: GymTableProps) => {
         title="Delete gym"
         description={`Are you sure you want to delete "${deleteTarget?.label ?? ""}"? This action is irreversible.`}
         confirmLabel="Delete"
+        pendingLabel="Deleting..."
         cancelLabel="Cancel"
-        destructive
-        loading={isDeleting}
+        variant="destructive"
+        isPending={isDeleting}
         onConfirm={handleConfirmDelete}
       />
     </Card>

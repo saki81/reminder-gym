@@ -53,11 +53,12 @@ if (!currentGym) {
   };
  
   const handleDelete = () => {
-    if (!confirmDelete) {
+     if (!confirmDelete) {
       setConfirmDelete(true);
       return;
     }
     deleteGym(currentGym.id);
+    setConfirmDelete(false)
   };
  
   return (
@@ -99,12 +100,6 @@ if (!currentGym) {
             Deleting this gym will permanently remove all equipment, maintenance
             records and categories. This action cannot be undone.
           </p>
- 
-        {/*  {confirmDelete && (
-            <p className="text-sm font-medium text-destructive">
-              Are you sure? Click again to confirm deletion.
-            </p>
-            )} */}
 
           <ConfirmDialog 
             open={!!confirmDelete}
@@ -114,10 +109,11 @@ if (!currentGym) {
             title="Delete gym"
             description=" Deleting this gym will permanently remove all equipment, maintenance
             records and categories. This action cannot be undone."
-            confirmLabel="Delete"
+            confirmLabel= "Delete"
+            pendingLabel="Deleting..."
             cancelLabel="Cancel"
-            destructive
-            loading={isDeleting}
+            variant="destructive"
+            isPending={isDeleting}
             onConfirm={handleDelete}
           />
            <Button
