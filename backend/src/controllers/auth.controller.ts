@@ -3,7 +3,7 @@ import bcrypt from "bcrypt"
 import { prisma } from "../lib/prisma.js";
 import { signToken } from "../utils/jwtToken.js";
 import { hashToken } from "../utils/hashToken.js";
-import { createAndSendVerificationOtp } from "../services/emailVerification.service.js";
+import { createAndSendVerificationOtp } from "../services/staffInvitation.service.js";
 import  transporter  from "../config/nodemailer.js"
 
 

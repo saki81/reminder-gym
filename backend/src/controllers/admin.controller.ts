@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { buildAdminUserFilters } from "../utils/admin.user.filters.js";
 import { buildAdminGymFilters } from "../utils/admin.gym.filters.js";
 import { prisma } from "../lib/prisma.js";
-import { createAndSendVerificationOtp } from "../services/emailVerification.service.js";
+
 
 
 // ADMIN dashboard statistic
