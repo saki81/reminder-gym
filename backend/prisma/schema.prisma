@@ -38,6 +38,8 @@ model User {
   verifyTokens      EmailVerificationToken[]
   resetSessions     PasswordResetSession[]
 
+  sentStaffInvitations StaffInvitation[] @relation("SentStaffInvitations")
+
   @@index([email])
   @@index([activeGymId])
 
@@ -63,6 +65,8 @@ model Admin {
   createdAt DateTime  @default(now())
 
   isOwner   Boolean   @default(false)
+
+  isActive Boolean @default(true) // activate/deactivate staff per gym 
 
   @@unique([userId, gymId], name: "admin_user_gym_unique")
   @@index([gymId])
@@ -211,8 +215,50 @@ model Gym {
 
   activeUsers  User[] @relation("ActiveGymId")
 
+  staffInvitationGyms StaffInvitationGym[]
+
   createdAt    DateTime    @default(now())
   updatedAt    DateTime @updatedAt 
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+}
+
+model StaffInvitation {
+    id          String           @id @default(uuid())
+ 
+  email       String
+  tokenHash   String           @unique   
+  status      InvitationStatus @default(PENDING)
+ 
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+ 
+  invitedById String
+  invitedBy   User             @relation("SentStaffInvitations", fields: [invitedById], references: [id], onDelete: Cascade)
+ 
+  gyms        StaffInvitationGym[]
+ 
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+ 
+  @@index([email])
+  @@index([invitedById, status])
+
+}
+
+model StaffInvitationGym {
+  invitationId String
+  invitation StaffInvitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  gymId        String
+  gym          Gym           @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+  @@id([invitationId, gymId])
+  @@index([gymId])
 }
 
 
