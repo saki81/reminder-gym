@@ -1,9 +1,12 @@
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import { Request } from "express";
 
+const userKey = (req: Request) => req.user?.userId ?? ipKeyGenerator(req.ip!);
+
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 6,
+  skipSuccessfulRequests: true, 
   message: {
    message: "Too many login attempts"
   }
@@ -43,6 +46,48 @@ export const forgotPasswordLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-   keyGenerator: (req: Request) => 
-    `${ipKeyGenerator(req.ip!)}-${req.body.email || "unknown"}`
-})
+   keyGenerator: (req: Request) =>
+    `${ipKeyGenerator(req.ip!)}-${String(req.body.email || "unknown").trim().toLowerCase()}`
+});
+
+export const changePasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: {
+    message: "Too many password change attempts. Try again later",
+  }, 
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: userKey 
+});
+
+export const inviteLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 20,
+  message: {
+   message: "Too many invitations sent. Try again later.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: userKey
+});
+ 
+export const invitationPreviewLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: {
+   message: "Too many attempts. Try again later.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+ 
+export const acceptInviteLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: {
+   message: "Too many attempts. Try again later.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});

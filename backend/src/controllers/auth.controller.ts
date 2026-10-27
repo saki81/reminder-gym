@@ -383,4 +383,8 @@ export const getMe = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
+};
+
+export  const updateProfile = async () => {
+    
 }

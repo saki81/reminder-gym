@@ -147,4 +147,61 @@ export const maintenanceSchema = z.object({
 
 export const updateMaintenaceSchema = maintenanceSchema.partial();
 
+// PROFILE
+export const updateProfileSchema = z.object({
+   name: z.string().trim().min(3, "Name must be at least 3 characters")
+   .max(50, "Name too long"),
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(4, "Current password is required"),
+
+  newPassword:  z.string().min(4, "Password must be at least 4 characters")
+  .max(50, "Password too long"),
+}).refine((data) => data.currentPassword !== data.newPassword, {
+    message: "New password must be different from the current one",
+    path: ["newPassword"],
+});
+
+// GYM SWITCH
+export const switchGymSchema = z.object({
+   gymId: z.string().uuid("Invalid gym id")
+});
+
+// STAFF
+const gymIdsSchema = z.array(z.string().uuid("Invalid gym id"))
+    .min(1, "Select at least one gym")
+    .max(20, "Too many gyms selected")
+    .refine((ids) => new Set(ids).size === ids.length, {
+        message: "Duplicate gyms are not allowed",
+    });
+ 
+export const inviteStaffSchema = z.object({
+    email: z.string().trim().toLowerCase().email("Invalid email format"),
+ 
+    gymIds: gymIdsSchema,
+});
+ 
+export const updateStaffGymsSchema = z.object({
+    gymIds: gymIdsSchema,
+});
+ 
+// gymIds je opcionalan: bez njega se akcija odnosi na SVE owner-ove teretane
+export const staffStatusSchema = z.object({
+    gymIds: gymIdsSchema.optional(),
+});
+ 
+// Token pozivnice: 32 slučajna bajta u hex obliku (64 znaka)
+export const invitationTokenSchema = z.object({
+    token: z.string().regex(/^[a-f0-9]{64}$/, "Invalid invitation token"),
+});
+ 
+export const acceptInvitationSchema = invitationTokenSchema.extend({
+    name: z.string().trim().min(3, "Name must be at least 3 characters")
+    .max(50, "Name too long"),
+ 
+    password: z.string().min(4, "Password must be at least 4 characters")
+    .max(50, "Password too long"),
+});
+ 
 
