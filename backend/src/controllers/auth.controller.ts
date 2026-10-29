@@ -385,6 +385,69 @@ export const getMe = async (req: Request, res: Response) => {
     }
 };
 
-export  const updateProfile = async () => {
-    
-}
+// PATCH /api/auth/me   body: { name }
+export  const updateProfile = async (req: Request, res: Response) => {
+        try {
+        const { name } = req.body as { name: string };
+ 
+        const user = await prisma.user.update({
+            where: { id: req.user!.userId },
+            data: { name },
+            select: { id: true, name: true },
+        });
+ 
+        return res.status(200).json({
+            message: "Profile updated successfully",
+            user,
+        });
+    } catch (error) {
+        console.error("updateProfile error:", error);
+ 
+        return res.status(500).json({ message: "Server error" });
+    }
+
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user!.userId;
+        const { currentPassword, newPassword } = req.body as {
+            currentPassword: string;
+            newPassword: string;
+        };
+ 
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { password: true },
+        });
+ 
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+ 
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+ 
+        if (!isMatch) {
+            return res.status(400).json({ message: "Current password is incorrect" });
+        }
+ 
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+ 
+        // Lozinka se mijenja, a otvoreni kodovi za reset lozinke se poništavaju
+        await prisma.$transaction([
+            prisma.user.update({
+                where: { id: userId },
+                data: { password: hashedPassword },
+            }),
+            prisma.passwordResetToken.deleteMany({ where: { userId } }),
+            prisma.passwordResetSession.deleteMany({ where: { userId } }),
+        ]);
+ 
+        return res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+        console.error("changePassword error:", error);
+ 
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+ 
