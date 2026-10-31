@@ -433,7 +433,7 @@ export const changePassword = async (req: Request, res: Response) => {
  
         const hashedPassword = await bcrypt.hash(newPassword, 10);
  
-        // Lozinka se mijenja, a otvoreni kodovi za reset lozinke se poništavaju
+       
         await prisma.$transaction([
             prisma.user.update({
                 where: { id: userId },
