@@ -32,9 +32,75 @@ const authCookieOptions = {
 // GET api/staff
 export const getStaff = async (req: Request, res: Response) => {
     try {
-        
+       const userId = req.user!.userId;
+       
+       const ownedGyms = await getOwnedGyms(userId);
+       const ownedGymIds = ownedGyms.map((gym) => gym.id);
+
+       const rows = await prisma.admin.findMany({
+           where: { role: "STAFF", gymId: { in: ownedGymIds} },
+           select: {
+                id: true,
+                isActive: true,
+                gym: { select: { id: true, gymName: true, city: true, isActive: true }},
+                user: {
+                    select: { id: true, name: true, email: true, isActive: true },
+                },
+           },
+            orderBy: { createdAt: "asc" },
+       });
+
+        // Jedan red po radniku, s listom njegovih teretana
+        const staffByUserId = new Map<string, {
+            userId: string;
+            name: string | null;
+            email: string;
+            accountActive: boolean;
+            memberships: {
+                adminId: string;
+                gymId: string;
+                gymName: string;
+                city: string | null;
+                isActive: boolean;
+                gymActive: boolean;
+            }[];
+        }>();
+
+                for (const row of rows) {
+            if (!row.gym) {
+                continue;
+            }
+ 
+            let member = staffByUserId.get(row.user.id);
+ 
+            if (!member) {
+                member = {
+                    userId: row.user.id,
+                    name: row.user.name,
+                    email: row.user.email,
+                    accountActive: row.user.isActive,
+                    memberships: [],
+                };
+                staffByUserId.set(row.user.id, member);
+            }
+ 
+            member.memberships.push({
+                adminId: row.id,
+                gymId: row.gym.id,
+                gymName: row.gym.gymName,
+                city: row.gym.city,
+                isActive: row.isActive,
+                gymActive: row.gym.isActive,
+            });
+        }
+          
+        return res.status(200).json({ staff: Array.from(staffByUserId.values())})
+
     } catch (error) {
-        
+        console.error("getStaff error:", error);
+ 
+        return res.status(500).json({ message: "Server error" });
+
     }
 };
 
