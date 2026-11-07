@@ -50,7 +50,7 @@ export const getStaff = async (req: Request, res: Response) => {
             orderBy: { createdAt: "asc" },
        });
 
-        // Jedan red po radniku, s listom njegovih teretana
+        // One entry per staff member, including a list of their gyms
         const staffByUserId = new Map<string, {
             userId: string;
             name: string | null;
@@ -107,18 +107,125 @@ export const getStaff = async (req: Request, res: Response) => {
 // PATCH /api/staff/:userId/gyms
 export const updateStaffGyms = async (req: Request, res: Response) => {
     try {
-        
+       const ownerId = req.user!.userId;
+       const staffUserId = String(req.params.userId);
+       const { gymIds } = req.body as { gymIds: string[] };
+       
+       const ownedGyms = await getOwnedGyms(ownerId);
+       const ownedGymIds = ownedGyms.map((gym) => gym.id);
+       const activeOwnedGymIds = ownedGyms.filter((gym) => gym.isActive).map((gym) => gym.id);
+
+       if (gymIds.some((id) => !activeOwnedGymIds.includes(id))) {
+           return res.status(403).json({
+                message: "You can only manage access for active gyms you own",
+           });
+       }
+
+     //  Employee records ONLY in the owner's gyms (gyms belonging to others remain untouched)
+       const currentRows = await prisma.admin.findMany({
+           where: { userId: staffUserId, gymId: { in: ownedGymIds } },
+           select: { id: true, gymId: true, role: true },
+       });
+
+       if (!currentRows.some((row) => row.role === "STAFF" )) {
+            return res.status(409).json({
+                message: "Cannot change access for an owner of the gym",
+            });
+       }
+
+       const rowByGymId = new Map(currentRows.map((row) => [row.gymId, row]));
+
+       if (gymIds.some((id) => rowByGymId.get(id)?.role === "OWNER")) {
+           return res.status(409).json({
+              message: "Cannot change access for an owner of the gym",
+           });
+       }
+
+       const gymIdsToAdd = gymIds.filter((id) => !rowByGymId.has(id));
+       const rowIdsToRemove = currentRows
+            .filter((row) => row.role === "STAFF" && row.gymId && !gymIds.includes(row.gymId))
+            .map((row) => row.id);
+
+       await prisma.$transaction(async (tx) => {
+           if (rowIdsToRemove.length > 0) {
+               await tx.admin.deleteMany({ where: { id: { in: rowIdsToRemove } } });
+           }
+
+           if (gymIdsToAdd.length > 0) {
+               await tx.admin.createMany({
+                  data: gymIdsToAdd.map((gymId) => ({
+                      userId: staffUserId,
+                      gymId,
+                      role: "STAFF" as const,
+                  })),
+               });
+           }
+
+           await syncActiveGym(tx, staffUserId);
+       });
+
+       return res.status(200).json({ message: "Staff access updated successfully" });
     } catch (error) {
-        
+        console.error("updatedStaffGyms error:", error);
+
+        return res.status(500).json({ message: "Server error" });
     }
 };
 
-// activate / deactivate
+// Shared logic for activate / deactivate
 const changeStaffStatus = async (req: Request, res: Response, isActive: boolean) => {
     try {
-        
+        const ownerId = req.user!.userId;
+        const staffUserId = String(req.params.userId);
+        const { gymIds } = req.body as { gymIds?: string[] };
+
+        const ownedGyms = await getOwnedGyms(ownerId);
+        const ownedGymIds = ownedGyms.map((gym) => gym.id);
+
+        if (gymIds && gymIds.some((id) => !ownedGymIds.includes(id))) {
+            return res.status(403).json({ message: "You can only manage gyms you own" });
+        }
+
+        const rows = await prisma.admin.findMany({
+            where: {
+                userId: staffUserId,
+                role: "STAFF",
+                gymId: { in: gymIds ?? ownedGymIds },
+            },
+            select: { id: true, isActive: true },
+        });
+ 
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Staff member not found" });
+        }
+
+        const rowIdsToChange = rows
+            .filter((row) => row.isActive !== isActive)
+            .map((row) => row.id);
+ 
+        if (rowIdsToChange.length === 0) {
+            return res.status(400).json({
+                message: isActive ? "Staff member is already active" : "Staff member is already inactive",
+            });
+        }
+ 
+        await prisma.$transaction(async (tx) => {
+            await tx.admin.updateMany({
+                where: { id: { in: rowIdsToChange } },
+                data: { isActive },
+            });
+ 
+            await syncActiveGym(tx, staffUserId);
+        });
+ 
+        return res.status(200).json({
+            message: isActive ? "Staff member activated successfully" : "Staff member deactivateed successfully",
+        })
+
     } catch (error) {
-        
+         console.error("changeStaffStatus error:", error);
+
+         return res.status(500).json({ message: "Server error" });
     }
 };
 
