@@ -236,23 +236,150 @@ export const activateStaff = (req: Request, res: Response) => changeStaffStatus(
 export const deactivateStaff = (req: Request, res: Response) => changeStaffStatus(req, res, false);
 
 
-// DELETE /api/staff/:userId
+// DELETE /api/staff/:userId / removes staff access only within the owner the staff account is not deleted
 export const removeStaff = async (req: Request, res: Response) => {
     try {
-        
+        const ownerId = req.user!.userId;
+        const staffUserId = String(req.params.userId);
+
+        const ownedGymIds = (await getOwnedGyms(ownerId)).map((gym) => gym.id);
+
+        const rows = await prisma.admin.findMany({
+            where: { userId: staffUserId, role: "STAFF", gymId: { in: ownedGymIds } },
+            select: { id: true },
+        });
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Staff member not found" });
+        }
+
+        await prisma.$transaction(async (tx) => {
+            await tx.admin.deleteMany({
+                where: { id:  { in: rows.map((row) => row.id) } },
+            });
+
+            await syncActiveGym(tx, staffUserId);
+        });
+
+        return res.status(200).json({ message: "Staff member removed successfully" });
     } catch (error) {
-        
+        console.error("removeStaff error:", error);
+ 
+        return res.status(500).json({ message: "Server error" });
+
     }
 };
 
 // OWNER: INVITATIONS
 
-// POST
+// POST  /api/staff/invitations
 export const inviteStaff = async (req: Request, res: Response) => {
     try {
+        const ownerId = req.user!.userId;
+        const { email, gymIds } = req.body as { email: string; gymIds: string[] };
+
+        const owner = await prisma.user.findUnique({
+            where: { id: ownerId },
+            select: { name: true, email: true },
+        });
+
+        if (!owner) {
+            return res.status(404).json({ message: "User not found" });
+        }
         
+        if (owner.email.toLowerCase() === email) {
+            return res.status(400).json({ message: "You cannot invite yourself" });
+        }
+
+        const activeOwnedGyms = await getOwnedGyms(ownerId, true);
+        const gymNameById = new Map(activeOwnedGyms.map((gym) => [gym.id, gym.gymName]));
+
+        if (gymIds.some((id) => !gymNameById.has(id))) {
+            return res.status(403).json({
+                message: "You can only invite staff to active gyms you own",
+            });
+        }
+        
+        const pendingCount = await prisma.staffInvitation.count({
+            where: { invitedById: ownerId, status: "PENDING"}
+        })
+
+        if (pendingCount >= MAX_PENDING_INVITATIONS) {
+            return res.status(400).json({
+                message: "Too many pending invitations. Revoke some first.",
+            })
+        }
+
+
+        let gymIdsToGrant = gymIds;
+        const existingUser = await findUserByEmail(email);
+ 
+        if (existingUser) {
+            const rows = await prisma.admin.findMany({
+                where: { userId: existingUser.id, gymId: { in: gymIds } },
+                select: { gymId: true },
+            });
+ 
+            const alreadyHaveAccess = new Set(rows.map((row) => row.gymId));
+            gymIdsToGrant = gymIds.filter((id) => !alreadyHaveAccess.has(id));
+ 
+        if (gymIdsToGrant.length === 0) {
+                return res.status(409).json({
+                    message: "This person already has access to the selected gyms",
+                });
+            }
+        }
+ 
+        const { token, tokenHash } = generateInvitationToken();
+ 
+        const invitation = await prisma.staffInvitation.create({
+            data: {
+                email,
+                tokenHash,
+                invitedById: ownerId,
+                expiresAt: new Date(Date.now() + INVITATION_TTL_MS),
+                gyms: { create: gymIdsToGrant.map((gymId) => ({ gymId })) },
+            },
+            include: invitationInclude,
+        });
+
+                try {
+            await sendStaffInvitationEmail({
+                to: email,
+                inviterName: owner.name ?? "A gym owner",
+                gymNames: gymIdsToGrant.map((id) => gymNameById.get(id)!),
+                token,
+            });
+
+        } catch (mailError) {
+            console.error("inviteStaff email error:", mailError);
+ 
+            await prisma.staffInvitation.delete({ where: { id: invitation.id } });
+ 
+            return res.status(502).json({ message: "Failed to send invitation email" });
+        }
+ 
+        // Novi poziv istom emailu poništava prethodne (tek nakon uspješnog slanja)
+        await prisma.staffInvitation.updateMany({
+            where: {
+                invitedById: ownerId,
+                status: "PENDING",
+                email: { equals: email, mode: "insensitive" },
+                id: { not: invitation.id },
+            },
+            data: { status: "REVOKED" },
+        });
+
+            return res.status(201).json({
+                message: "Invitation sent successfully",
+                invitation: formatInvitation(invitation),
+            });
+
     } catch (error) {
-        
+        console.error("inviteStaff error:", error);
+ 
+        return res.status(500).json({ message: "Server error" });
+
     }
 };
 
