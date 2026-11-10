@@ -386,54 +386,281 @@ export const inviteStaff = async (req: Request, res: Response) => {
 // GET /api/staff/invitations
 export const getInvitations = async (req: Request, res: Response) => {
     try {
-        
+        const  invitations = await prisma.staffInvitation.findMany({
+            where: { invitateById: req.user!.userId, status: "PENDING" },
+            include: invitationInclude,
+            orderBy: { createdAt: "desc" },
+        })
+
+        return res.status(200).json({ invitations: invitations.map(formatInvitation) });
     } catch (error) {
-        
+        console.error("getInvitations error:", error);
+
+        return res.status(500).json({ message: "Server error"})
     }
 };
 
 // POST /api/staff/invitations/:id/resend   (new token)
 export const resendInvitation = async (req: Request, res: Response) => {
     try {
+        const ownerId = req.user!.userId;
+ 
+        const invitation = await prisma.staffInvitation.findFirst({
+            where: { id: String(req.params.id), invitedById: ownerId, status: "PENDING" },
+            include: invitationInclude,
+        });
+ 
+        if (!invitation) {
+            return res.status(404).json({ message: "Invitation not found" });
+        }
+ 
+        // Samo teretane koje owner i dalje posjeduje i koje su aktivne
+        const activeOwnedGymIds = (await getOwnedGyms(ownerId, true)).map((gym) => gym.id);
+        const validGyms = invitation.gyms.filter(({ gym }) => activeOwnedGymIds.includes(gym.id));
+ 
+        if (validGyms.length === 0) {
+            return res.status(400).json({
+                message: "None of the invited gyms are available anymore",
+            });
+        }
+ 
+        const owner = await prisma.user.findUnique({
+            where: { id: ownerId },
+            select: { name: true },
+        });
+ 
+        const { token, tokenHash } = generateInvitationToken();
+ 
+        // Prvo se šalje mail, pa se tek onda mijenja hash (ako slanje padne, stari link i dalje radi)
+        try {
+            await sendStaffInvitationEmail({
+                to: invitation.email,
+                inviterName: owner?.name ?? "A gym owner",
+                gymNames: validGyms.map(({ gym }) => gym.gymName),
+                token,
+            });
+        } catch (mailError) {
+            console.error("resendInvitation email error:", mailError);
+ 
+            return res.status(502).json({ message: "Failed to send invitation email" });
+        }
+ 
+        const updated = await prisma.staffInvitation.update({
+            where: { id: invitation.id },
+            data: { tokenHash, expiresAt: new Date(Date.now() + INVITATION_TTL_MS) },
+            include: invitationInclude,
+        });
+ 
+        return res.status(200).json({
+            message: "Invitation resent successfully",
+            invitation: formatInvitation(updated),
+        });
+
         
     } catch (error) {
-        
+        console.error("resendInvitation error:", error);
+ 
+        return res.status(500).json({ message: "Server error" });
+
     }
 };
 
-// DELETE /api/staff/invitations/:id 
+// DELETE /api/staff/invitations/:id  (opoziv)
 export const revokeInvitation = async (req: Request, res: Response) => {
     try {
+        const result = await prisma.staffInvitation.updateMany({
+            where: {
+                id: String(req.params.id),
+                invitedById: req.user!.userId,
+                status: "PENDING",
+            },
+            data: { status: "REVOKED" },
+        });
         
+        if (result.count === 0) {
+            return res.status(404).json({ message: "Invitation not found" });
+        }
+
+        return res.status(200).json({ message: "Invitation revoked successfully" });
     } catch (error) {
-        
+        console.error("revokeInvitation error:", error);
+ 
+        return res.status(500).json({ message: "Server error" });
+
     }
 };
 
 // STAFF MEMBER: REVIEW AND ACCEPTANCE OF INVITATION
 export const previewInvitation = async (req: Request, res: Response) => {
     try {
-        
+        const { token } = req.body as { token: string };
+
+        const invitation = await findPendingInvitationByToken(token);
+
+        if (!invitation) {
+            return res.status(404).json({ message: INVALID_INVITATION });
+        }
+
+        const existingUser = await findUserByEmail(invitation.email);
+
+        return res.status(200).json({
+            invitation: {
+                email: invitation.email,
+                invitedBy: invitation.invitedBy.name ?? "A gym owner",
+                expiresAt: invitation.expiresAt,
+                accountExists: Boolean(existingUser),
+                gyms: invitation.gyms.map(({ gym }) => gym)
+            }
+        })
     } catch (error) {
-        
+        console.error("previewInvitation error:", error);
+ 
+        return res.status(500).json({ message: "Server error" });
+
     }
 };
 
 // POST /api/staff/accept
 export const acceptInvitation = async (req: Request, res: Response) => {
     try {
-        
+         const { token, name, password } = req.body as {
+            token: string;
+            name: string;
+            password: string;
+        };
+ 
+        const invitation = await findPendingInvitationByToken(token);
+ 
+        if (!invitation) {
+            return res.status(404).json({ message: INVALID_INVITATION });
+        }
+ 
+        if (await findUserByEmail(invitation.email)) {
+            return res.status(409).json({
+                message: "An account with this email already exists. Log in to accept the invitation.",
+            });
+        }
+ 
+        const gymIds = await getGrantableGymIds(null, invitation);
+ 
+        if (gymIds.length === 0) {
+            return res.status(404).json({ message: INVALID_INVITATION });
+        }
+ 
+        const hashedPassword = await bcrypt.hash(password, 10);
+ 
+        const user = await prisma.$transaction(async (tx) => {
+            // Prvo se pozivnica zaključa: drugi zahtjev sa istim linkom ovdje dobija false
+            const claimed = await claimInvitation(tx, invitation.id);
+ 
+            if (!claimed) {
+                return null;
+            }
+ 
+            // Email je potvrđen jer je link stigao baš na tu adresu
+            const createdUser = await tx.user.create({
+                data: {
+                    email: invitation.email,
+                    password: hashedPassword,
+                    name,
+                    emailVerified: true,
+                    emailVerifiedAt: new Date(),
+                },
+            });
+ 
+            await grantStaffAccess(tx, createdUser.id, gymIds);
+            await syncActiveGym(tx, createdUser.id);
+ 
+            return createdUser;
+        });
+ 
+        if (!user) {
+            return res.status(404).json({ message: INVALID_INVITATION });
+        }
+ 
+        // Radnik je odmah prijavljen; svaki sljedeći put se prijavljuje emailom i lozinkom
+        res.cookie("accessToken", signToken({ userId: user.id }), authCookieOptions);
+ 
+        return res.status(201).json({ message: "Account created and invitation accepted" });
+ 
     } catch (error) {
-        
+        // dvije istovremene registracije istim emailom (unique constraint)
+        if ((error as { code?: string }).code === "P2002") {
+            return res.status(409).json({
+                message: "An account with this email already exists. Log in to accept the invitation.",
+            });
+        }
+ 
+        console.error("acceptInvitation error:", error);
+ 
+        return res.status(500).json({ message: "Server error" });
+
     }
 };
 
 // POST /api/staff/accept-existing   body: { token }   (verifyToken, employee already has an account)
 export const acceptInvitationExisting = async (req: Request, res: Response) => {
     try {
-        
+        const userId = req.user!.userId;
+        const { token } = req.body as { token: string };
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { email: true, emailVerified: true },
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const invitation = await findPendingInvitationByToken(token);
+
+        if (!invitation) {
+            return res.status(404).json({ message: INVALID_INVITATION });
+        }
+
+        if (user.email.toLowerCase() !== invitation.email.toLowerCase()) {
+             return res.status(403).json({
+                message: "This invitation was sent to a different email address",
+             });
+        }
+
+        const gymIds = await getGrantableGymIds(userId, invitation);
+
+        if (gymIds.length === 0) {
+             return res.status(404).json({ message: INVALID_INVITATION });
+        }
+
+        const claimed = await prisma.$transaction(async (tx) => {
+            const isClaimed = await claimInvitation(tx, invitation.id);
+
+            if (!isClaimed) {
+                return false;
+            }
+
+            await grantStaffAccess(tx, userId, gymIds);
+            await syncActiveGym(tx, userId);
+
+            if (!user.emailVerified) {
+                await tx.user.update({
+                    where: { id: userId },
+                    data: { emailVerified: true, emailVerifiedAt: new Date() },
+                });
+            }
+
+            return true;
+        });
+
+        if (!claimed) {
+             return res.status(404).json({ message: INVALID_INVITATION });
+        }
+
+        return res.status(200).json({ message: "Invitation accepted successfully" });
     } catch (error) {
-        
+        console.error("acceptInvitationExisting error:", error);
+ 
+        return res.status(500).json({ message: "Server error" });
+
     }
-}
+};
  
