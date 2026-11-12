@@ -11,7 +11,8 @@ export const createCategory = async ( req: Request, res: Response) => {
     }
 
     const gymAccess = await getGymAccess(userId, {
-      minimumRole: "STAFF"
+      minimumRole: "STAFF",
+      requestedGymId: req.header("x-gym-id"),
     });
 
     if (!gymAccess) {
@@ -65,6 +66,7 @@ export const getCategories = async (req: Request, res: Response) => {
 
     const gymAccess = await getGymAccess(userId, {
       minimumRole: "STAFF",
+      requestedGymId: req.header("x-gym-id"),
     });
 
     if (!gymAccess) {
@@ -109,6 +111,7 @@ export const updateCategory = async (req: Request, res: Response) => {
     
     const gymAccess = await getGymAccess(userId, {
       minimumRole: "STAFF",
+      requestedGymId: req.header("x-gym-id"),
     });
 
     if (!gymAccess) {
@@ -178,6 +181,7 @@ export const deleteCategory = async (req: Request, res: Response) => {
 
     const gymAccess = await getGymAccess(userId, {
       minimumRole: "STAFF",
+      requestedGymId: req.header("x-gym-id"),
     });
 
     if (!gymAccess) {

@@ -13,7 +13,8 @@ export const createMaintenance = async (req: Request, res: Response) => {
     }
 
     const gymAccess = await getGymAccess(userId, {
-      minimumRole: "STAFF"
+      minimumRole: "STAFF",
+      requestedGymId: req.header("x-gym-id"),
     });
 
     if (!gymAccess) {
@@ -89,6 +90,7 @@ export const getMaintenances = async (req: Request, res: Response) => {
 
     const gymAccess = await getGymAccess(userId, {
       minimumRole: "STAFF",
+      requestedGymId: req.header("x-gym-id"),
     });
 
     if (!gymAccess) {
@@ -181,6 +183,7 @@ export const updateMaintenance = async (
 
     const gymAccess = await getGymAccess(userId, {
       minimumRole: "STAFF",
+      requestedGymId: req.header("x-gym-id"),
     });
 
     if (!gymAccess) {
@@ -281,6 +284,7 @@ export const deleteMaintenance = async (
 
     const gymAccess = await getGymAccess(userId, {
       minimumRole: "STAFF",
+      requestedGymId: req.header("x-gym-id"),
     });
 
     if (!gymAccess) {

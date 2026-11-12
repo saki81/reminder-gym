@@ -8,7 +8,7 @@ import equipmentRoutes from "./routes/equipment.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import maintenanceRoutes from "./routes/maintenance.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
-//import staffRoutes from "./routes/staff.routes.js"
+import staffRoutes from "./routes/staff.routes.js"
 
 dotenv.config();
 
@@ -20,7 +20,7 @@ app.use(cors({
     origin: "http://localhost:5173",
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Gym-Id"],
 }));
 
 app.use(express.json());
@@ -38,7 +38,7 @@ app.use("/api/equipment", equipmentRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/maintenances", maintenanceRoutes);
 app.use("/api/admin", adminRoutes);
-//app.use("/api/staff", staffRoutes);
+app.use("/api/staff", staffRoutes);
 
 
 const PORT = process.env.PORT || 5000;

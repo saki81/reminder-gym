@@ -349,7 +349,9 @@ export const getMe = async (req: Request, res: Response) => {
 
     if (!userId) {
           return res.status(401).json({ message: "Unauthorized - no userId" });
-}
+    }
+
+    const requestedGymId = req.header("x-gym-id");  
 
     try {
         
@@ -369,7 +371,7 @@ export const getMe = async (req: Request, res: Response) => {
 
         const activeAdmin = user.admins.find((a) => a.role === "ADMIN" && a.gymId === null) ??
                             user.admins.find((a) => a.role === "ADMIN") ??
-                            user.admins.find((a) => a.gymId === user.activeGymId) ??
+                            user.admins.find((a) => a.gymId === (requestedGymId  || user.activeGymId)) ??
                             user.admins[0];
 
     return res.json({

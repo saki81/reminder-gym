@@ -15,6 +15,7 @@ export const createEquipment = async (req:Request, res: Response) => {
 
         const gymAccess = await getGymAccess(userId, {
              minimumRole: "STAFF",
+             requestedGymId: req.header("x-gym-id"),
         });
 
         if (!gymAccess) {
@@ -105,6 +106,7 @@ export const getEquipments = async (req:Request, res:Response) => {
          
         const gymAccess = await getGymAccess(userId, {
           minimumRole: "STAFF",
+          requestedGymId: req.header("x-gym-id"),
         });
 
         if (!gymAccess) {
@@ -163,7 +165,8 @@ export const getEquipmentById = async (req:Request, res:Response) => {
            }
 
            const gymAccess = await getGymAccess(userId, {
-               minimumRole: "STAFF"
+               minimumRole: "STAFF",
+               requestedGymId: req.header("x-gym-id"),
            });
 
            if (!gymAccess) {
@@ -219,7 +222,8 @@ export const updateEquipment = async (req:Request, res:Response) => {
          }
 
          const gymAccess = await getGymAccess(userId, {
-            minimumRole: "STAFF"
+            minimumRole: "STAFF",
+            requestedGymId: req.header("x-gym-id"),
          });
 
          if (!gymAccess) {
@@ -341,7 +345,8 @@ export const deleteEquipment = async (req: Request, res: Response) => {
         }
 
         const gymAccess = await getGymAccess(userId, {
-            minimumRole: "OWNER"
+            minimumRole: "OWNER",
+            requestedGymId: req.header("x-gym-id"),
         });
 
         if (!gymAccess) {

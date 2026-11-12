@@ -11,7 +11,9 @@ export const getGymDashboard = async (req: Request, res: Response) => {
          return res.status(401).json({message: "Unauthorized"});
        }
 
-       const access = await getGymAccess(userId);
+       const access = await getGymAccess(userId, {
+          requestedGymId: req.header("x-gym-id"),
+       });
 
        if (!access) {
          return res.status(403).json({message: "You do not have access to this gym"});
