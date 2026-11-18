@@ -1,8 +1,7 @@
-
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { Navbar }     from "./Navbar";
-import { Toaster }    from "@/components/ui/sonner";
+
 
 
 type Props = {

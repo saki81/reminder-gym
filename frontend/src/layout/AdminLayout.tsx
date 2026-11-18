@@ -1,6 +1,6 @@
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Toaster } from "@/components/ui/sonner";
+
 import { AdminSidebar } from "./AdminSidebar";
 
 type Props = {

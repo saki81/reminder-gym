@@ -25,7 +25,8 @@ export function useSwitchGym() {
             } else {
                 toast.success("Gym switched successfully");
             }
-
+            
+            queryClient.invalidateQueries({ queryKey: ["me"] });
             queryClient.invalidateQueries({ queryKey: ["equipment"] });
             queryClient.invalidateQueries({ queryKey: ["maintenance"] });
             queryClient.invalidateQueries({ queryKey: ["categories"] });

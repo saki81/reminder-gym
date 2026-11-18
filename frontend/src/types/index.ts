@@ -381,4 +381,88 @@ export type GetDashboardResponse = {
   dashboard: AdminDashboard;
 }
 
-  
+// PROFILE
+export type UpdateProfile = {
+  name: string;
+};
+
+export type ChangePassword = {
+  currentPassword: string;
+  newPassword: string;
+};
+
+// STAFF
+export type StaffGym = {
+  id: string;
+  gymName: string;
+  city: string | null;
+};
+
+export type StaffMembership = {
+  adminId: string;
+  gymId: string;
+  gymName: string;
+  city: string | null;
+  isActive: boolean;
+  gymActive: boolean;
+};
+
+export type StaffMember = {
+  userId: string;
+  name: string | null;
+  email: string;
+  accountActive: boolean;
+  memberships: StaffMembership[];
+};
+
+export type GetStaffResponse = {
+  staff: StaffMember[];
+};
+
+export type InvitationStatus = "PENDING" | "ACCEPTED" | "REVOKED";
+
+export type StaffInvitation = {
+  id: string;
+  email: string;
+  status: InvitationStatus;
+  createdAt: string;
+  expiresAt: string;
+  expired: boolean;
+  gyms: StaffGym;
+};
+
+export type GetInvitationsResponse = {
+  invitations: StaffInvitation[];
+};
+ 
+export type InviteStaff = {
+  email: string;
+  gymIds: string[];
+};
+ 
+export type UpdateStaffGyms = {
+  gymIds: string[];
+};
+
+export type StaffStatusPayload = {
+  gymIds?: string[];
+};
+ 
+export type InvitationPreview = {
+  email: string;
+  invitedBy: string;
+  expiresAt: string;
+  accountExists: boolean;
+  gyms: StaffGym[];
+};
+ 
+export type InvitationPreviewResponse = {
+  invitation: InvitationPreview;
+};
+ 
+export type AcceptInvitation = {
+  token: string;
+  name: string;
+  password: string;
+};
+ 
