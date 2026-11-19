@@ -3,7 +3,9 @@ import type {
   Register,
   Login,
   ForgotPassword,
-  ResetPassword
+  ResetPassword,
+  UpdateProfile,
+  ChangePassword
 } from "../types/index";
 
  
@@ -36,5 +38,11 @@ export const authApi = {
   },
  
     resetPassword: (data: ResetPassword) => 
-        apiClient.post("/auth/reset-password", data)
+        apiClient.post("/auth/reset-password", data),
+
+    updateProfile: (data: UpdateProfile) => 
+        apiClient.patch("/auth/me", data),
+
+    changePassword: (data: ChangePassword) =>
+        apiClient.post("/auth/change-password", data)
 }
