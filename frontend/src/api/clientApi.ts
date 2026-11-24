@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getActiveGymId } from "../utils/activeGym";
+import { setActiveGymId } from "../utils/activeGym";
 
 export const apiClient = axios.create({
     baseURL: "/api",/* import.meta.env.VITE_API_URL ??*/ /*"http://localhost:5001/api",*/
@@ -38,6 +39,8 @@ apiClient.interceptors.response.use((res) => res, (err) => {
 
     // only real session expiry
     if (status === 401 && !isIgnored) {
+        setActiveGymId(null); 
+
       console.warn("Session expired → redirect login");
       window.location.href = "/login";
     }
